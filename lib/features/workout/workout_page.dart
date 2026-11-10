@@ -36,7 +36,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // L'header comune a tutte le tab: "myWorkout" e il cerchio del profilo.
+      // L'header comune a tutte le tab: "InScheda" e il cerchio del profilo.
       appBar: const MainAppBar(),
       // FutureBuilder ridisegna la pagina quando il Future cambia stato:
       // in attesa → completato con i dati, oppure → errore.

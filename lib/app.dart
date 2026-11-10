@@ -76,7 +76,7 @@ class MyWorkoutApp extends StatelessWidget {
 
   Widget _buildApp() {
     return MaterialApp(
-      title: 'myWorkout',
+      title: 'InScheda',
       debugShowCheckedModeBanner: false,
       // L'app è in italiano: anche i pezzi di Flutter (il calendario per
       // scegliere una data, i tooltip, "OK"/"Annulla") devono esserlo.

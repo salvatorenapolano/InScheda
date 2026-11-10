@@ -1,4 +1,6 @@
-# myWorkout — contesto del progetto
+# InScheda — contesto del progetto
+
+> Il nome visibile dell'app è **InScheda** ("stare in scheda" = seguire il programma), scelto il 10/11/2026 al posto di myWorkout, troppo simile a Myworkout GO (Myworkout AS) e ad altre app. Restano "myWorkout" i nomi interni: pacchetto Dart `my_workout`, classe `MyWorkoutApp`, ID `io.github.salvatorenapolano.myworkout` (non si cambia), repo e cartella `myWorkout_public`, la chiave di firma.
 
 App Flutter **pubblica e open source** (licenza MIT) per la palestra: scheda di allenamento, dieta settimanale, pesata settimanale (giorno a scelta) e lista della spesa. Nasce dalla versione personale (repo privato `myWorkout_private`). Ogni utente parte **senza dati**: al primo avvio crea la sua scheda (onboarding), la dieta la scrive dalla tab Dieta; nell'app c'è solo la libreria esercizi. Distribuzione: APK su GitHub Releases, poi Google Play (niente App Store: niente Apple Developer Program).
 È anche un progetto **per imparare Flutter**: procediamo step by step.
@@ -8,7 +10,7 @@ App Flutter **pubblica e open source** (licenza MIT) per la palestra: scheda di 
 - **Lingua**: rispondi in italiano. Spiega i concetti Flutter/Dart nuovi che ogni modifica introduce; commenti nel codice in italiano.
 - **Ambiente**: Windows 11, VS Code + Android Studio, Flutter 3.47.9 (Dart 3.13). Provo l'app su un **emulatore Android** (la lancio io con F5). Questa versione si distribuisce solo per Android (vedi "Build e distribuzione").
 - **Verifica**: ogni modifica si chiude con `flutter analyze` (zero problemi) e `flutter test` (tutti verdi). Non installare/avviare l'app sul mio emulatore al posto mio.
-- **Codice su GitHub**: https://github.com/salvatorenapolano/myWorkout (branch `main`, **pubblico**: mai committare chiavi, keystore o dati personali). La versione personale è in `salvatorenapolano/myWorkout_private`.
+- **Codice su GitHub**: https://github.com/salvatorenapolano/InScheda (rinominato da `myWorkout` il 10/11/2026: i link vecchi reindirizzano; branch `main`, **pubblico**: mai committare chiavi, keystore o dati personali). La versione personale è in `salvatorenapolano/myWorkout_private`.
 
 ## Stato delle funzioni
 
@@ -27,7 +29,7 @@ App Flutter **pubblica e open source** (licenza MIT) per la palestra: scheda di 
 - Stile "lavagna della sala pesi": font **Barlow Semi Condensed** (in `assets/fonts/`, licenza OFL) per titoli e numeri, font di sistema per il testo; raggi 28 (banner) / 20 (card) / 12 (riquadri interni); pagine grigio chiaro con card bianche (in scuro: card più chiare dello sfondo). Tutto in `lib/app_theme.dart`.
 - Pacchetti: `flutter_svg` (anteprime), `shared_preferences` (pesi salvati), `youtube_player_iframe` (video), `path_provider` (cartella dei dati dell'utente), `flutter_localizations` (Flutter in italiano).
 - Nessun backend e niente download: la libreria (esercizi e immagini) è **negli asset**; scheda e dieta dell'utente sono JSON sul telefono (`UserDataStore`), pesi, pesate e spunte in `shared_preferences`.
-- Android: permesso `INTERNET` nel manifest (serve ai video). Nome app sotto l'icona: **myWorkout**. ID app (Android e iOS) `io.github.salvatorenapolano.myworkout`: definitivo, non cambiarlo dopo la pubblicazione su Google Play.
+- Android: permesso `INTERNET` nel manifest (serve ai video). Nome app sotto l'icona: **InScheda** (`android:label`, `CFBundleDisplayName`; logo nell'header "In" + "**Scheda**" nel colore principale, benvenuto "Benvenuto su InScheda"). ID app (Android e iOS) `io.github.salvatorenapolano.myworkout`: definitivo, non cambiarlo dopo la pubblicazione su Google Play.
 - Icona: dopo `dart run flutter_launcher_icons` **ripristinare** `ios/Runner.xcodeproj/project.pbxproj` (`git checkout -- …`): la v0.14.4 lo modifica per errore (mette `AppIcon` in `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS`).
 
 ## Struttura del codice
@@ -125,7 +127,7 @@ Nella scelta esercizi, **Crea un esercizio**: nome, gruppo muscolare (decide anc
 
 ## Com'è fatta l'interfaccia
 
-**Header** (tutte e 4 le tab, `MainAppBar`): "my**Workout**" (Workout nel colore principale) a sinistra, a destra il cerchio grigio sfumato con le **iniziali del nome** (icona persona se manca). Tocco sul cerchio → pannello dal basso: avatar e nome con matita per cambiarlo. Il pulsante **Scarica gli ultimi dati** è stato tolto (non serve nella versione pubblica). Le pagine non hanno più un titolo loro.
+**Header** (tutte e 4 le tab, `MainAppBar`): "my**Workout**" (Workout nel colore principale) a sinistra, a destra il cerchio grigio sfumato con le **iniziali del nome** (icona persona se manca) e un piccolo **ingranaggio** viola in basso a destra (`ProfileAvatar(settingsBadge: true)`, tooltip "Profilo e impostazioni"): fa capire che da lì si cambiano scheda, dieta e pesata. Lo stesso avatar con ingranaggio compare nella card finale dell'onboarding. Tocco sul cerchio → pannello dal basso: avatar e nome con matita per cambiarlo. Il pulsante **Scarica gli ultimi dati** è stato tolto (non serve nella versione pubblica). Le pagine non hanno più un titolo loro.
 
 **Allenamento**
 - In alto `TodayBanner`: "Oggi: Push" + muscoli del giorno (colorato, con "PUSH" in filigrana) / "Oggi riposo · prossimo allenamento domani: Pull" / "Scheda terminata". Senza orario (resta nel JSON).
@@ -170,7 +172,7 @@ File "myWorkout" con wireframe iniziali (pagine Wireframe/Componenti/Design, var
 
 ## Onboarding (versione pubblica)
 
-Primo avvio: **Benvenuto → Come ti chiami? → Quando ti alleni? → Le tue schede → Quando ti pesi? → Tutto pronto** (`lib/features/onboarding/`). Si avanza solo coi pulsanti (niente swipe); "Avanti" è spento senza nome, senza giorni, o se una scheda non ha esercizi. La scheda vive in un `PlanDraft` e si salva solo con "Entra" (prima `savePlan`, poi `completeOnboarding`). "Quando ti pesi?": un giorno solo (`WeighInDayPicker`, venerdì preselezionato). "Tutto pronto" riassume schede, giorni e pesata, e in una card con l'avatar spiega che **scheda, dieta e giorno della pesata si cambiano dal cerchio del profilo**. Nel pannello del profilo: Modifica la scheda, Modifica la dieta, "Pesata: ogni venerdì" (dialog coi 7 giorni).
+Primo avvio: **Benvenuto → Come ti chiami? → Quando ti alleni? → Le tue schede → Quando ti pesi? → Tutto pronto** (`lib/features/onboarding/`). Si avanza solo coi pulsanti (niente swipe); "Avanti" è spento senza nome, senza giorni, o se una scheda non ha esercizi. La scheda vive in un `PlanDraft` e si salva solo con "Entra" (prima `savePlan`, poi `completeOnboarding`). "Quando ti pesi?": un giorno solo (`WeighInDayPicker`, venerdì preselezionato). "Tutto pronto" riassume schede, giorni e pesata, e in una card con l'avatar spiega che **scheda, dieta e giorno della pesata si cambiano dal cerchio del profilo**. Nel pannello del profilo: Modifica la scheda, Modifica la dieta, "Modifica giorno pesata (Attualmente è venerdì)" (dialog coi 7 giorni).
 Piano deciso:
 1. ✅ Benvenuto + nome (iniziali nell'avatar, nome modificabile dal profilo). Immagine del profilo: in futuro, non prioritaria.
 2. ✅ Strato **dati utente** (`UserDataStore`): la scheda dell'utente è salvata in `<support>/user_data/assets/data/workout_plan.json`, stesso formato e percorso degli asset. `DataBundle(cartella, below)` si impila: utente → app (`userData.bundleOver(assets ?? rootBundle)` in app.dart, memoizzato; `MyWorkoutApp.assets` serve ai test per i dati di prova). La libreria esercizi e le immagini arrivano sempre dal piano di sotto. Tutti i modelli di scheda e dieta hanno `toJson()`. Da sapere: se una versione nuova dell'app toglie un esercizio usato nella scheda dell'utente, la tab Allenamento mostra l'errore.

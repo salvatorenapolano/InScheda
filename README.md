@@ -1,4 +1,6 @@
-# myWorkout
+# InScheda
+
+*Stare in scheda*: la scheda della palestra e la dieta che ti hanno dato, sempre in tasca.
 
 App Flutter per la palestra: scheda di allenamento, dieta settimanale e pesata settimanale, tutto in un'unica app, senza account e senza server.
 

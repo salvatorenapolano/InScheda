@@ -121,11 +121,11 @@ void main() {
   testWidgets("L'header ha il nome dell'app e il profilo mostra il nome", (tester) async {
     await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, profile: profile, userData: userData, assets: assets));
     await tester.pumpAndSettle();
-    expect(find.text('myWorkout'), findsOneWidget);
+    expect(find.text('InScheda'), findsOneWidget);
     expect(find.text('MR'), findsOneWidget);
 
     // Tocco il cerchio: si apre il pannello dal basso, col nome.
-    await tester.tap(find.byTooltip('Profilo'));
+    await tester.tap(find.byTooltip('Profilo e impostazioni'));
     await tester.pumpAndSettle();
     expect(find.text('Mario Rossi'), findsOneWidget);
     // Il download da GitHub non c'è più.

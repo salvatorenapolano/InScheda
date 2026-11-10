@@ -125,7 +125,7 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Profilo'));
+    await tester.tap(find.byTooltip('Profilo e impostazioni'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Modifica la scheda'));
     await tester.pumpAndSettle();
@@ -215,7 +215,7 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Profilo'));
+    await tester.tap(find.byTooltip('Profilo e impostazioni'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Modifica la scheda'));
     await tester.pumpAndSettle();

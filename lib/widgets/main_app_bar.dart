@@ -4,7 +4,7 @@ import 'package:my_workout/app_theme.dart';
 import 'package:my_workout/features/profile/profile_avatar.dart';
 import 'package:my_workout/features/profile/profile_sheet.dart';
 
-/// L'header di tutte le tab: "myWorkout" a sinistra, il cerchio del
+/// L'header di tutte le tab: il logo "InScheda" a sinistra, il cerchio del
 /// profilo a destra. [bottom] serve alle pagine con le schede (Dieta, Spesa).
 ///
 /// Uno Scaffold accetta come appBar solo un PreferredSizeWidget: un widget
@@ -24,21 +24,23 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       // Text.rich: un testo fatto di pezzi con stili diversi.
-      // Tutto in Russo One (il font del logo); "Workout" col colore principale.
+      // Tutto in Russo One (il font del logo); "Scheda" col colore principale.
+      // ("Stare in scheda" = seguire il programma: da qui il nome.)
       title: Text.rich(
         TextSpan(
           style: const TextStyle(fontFamily: AppTheme.logoFont, fontWeight: FontWeight.w400),
           children: [
-            const TextSpan(text: 'my'),
-            TextSpan(text: 'Workout', style: TextStyle(color: primary)),
+            const TextSpan(text: 'In'),
+            TextSpan(text: 'Scheda', style: TextStyle(color: primary)),
           ],
         ),
       ),
       actions: [
         IconButton(
-          tooltip: 'Profilo',
+          // L'ingranaggio sul cerchio fa capire che da qui si cambiano i dati.
+          tooltip: 'Profilo e impostazioni',
           onPressed: () => showProfileSheet(context),
-          icon: const ProfileAvatar(),
+          icon: const ProfileAvatar(settingsBadge: true),
         ),
         const SizedBox(width: 8),
       ],

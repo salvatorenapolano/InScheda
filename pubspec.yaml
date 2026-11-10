@@ -87,7 +87,7 @@ flutter:
           weight: 600
         - asset: assets/fonts/BarlowSemiCondensed-Bold.ttf
           weight: 700
-    # Il font del logo "myWorkout" nell'header: ha un solo spessore.
+    # Il font del logo "InScheda" nell'header: ha un solo spessore.
     # Licenza OFL: vedi assets/fonts/RussoOne-OFL.txt.
     - family: RussoOne
       fonts:

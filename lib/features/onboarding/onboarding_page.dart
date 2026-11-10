@@ -241,8 +241,8 @@ class _WelcomeStep extends StatelessWidget {
         const SizedBox(height: 32),
         Text.rich(
           TextSpan(
-            text: 'Benvenuto in my',
-            children: [TextSpan(text: 'Workout', style: TextStyle(color: colors.primary))],
+            text: 'Benvenuto su In',
+            children: [TextSpan(text: 'Scheda', style: TextStyle(color: colors.primary))],
           ),
           style: theme.textTheme.headlineMedium,
           textAlign: TextAlign.center,
@@ -461,12 +461,12 @@ class _ReadyStep extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                ProfileAvatar(size: 40, initials: initialsOf(name)),
+                ProfileAvatar(size: 40, initials: initialsOf(name), settingsBadge: true),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
                     'Scheda, dieta e giorno della pesata li cambi quando vuoi '
-                    'toccando il cerchio del profilo, in alto a destra.',
+                    "toccando il cerchio del profilo con l'ingranaggio, in alto a destra.",
                     style: theme.textTheme.bodyMedium,
                   ),
                 ),

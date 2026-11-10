@@ -34,10 +34,14 @@ class ProfileSheet extends StatelessWidget {
     if (name != null) await profile.setName(name);
   }
 
-  Future<void> _editWeighInDay(BuildContext context, ProfileStore profile) async {
+  Future<void> _editWeighInDay(
+    BuildContext context,
+    ProfileStore profile,
+  ) async {
     final day = await showDialog<int>(
       context: context,
-      builder: (context) => _WeighInDayDialog(initialDay: profile.weighInWeekday),
+      builder: (context) =>
+          _WeighInDayDialog(initialDay: profile.weighInWeekday),
     );
     if (day != null) await profile.setWeighInWeekday(day);
   }
@@ -101,7 +105,9 @@ class ProfileSheet extends StatelessWidget {
             FilledButton.tonalIcon(
               onPressed: () => _editWeighInDay(context, profile),
               icon: const Icon(Icons.monitor_weight_outlined),
-              label: Text('Pesata: ogni ${formatWeekday(profile.weighInWeekday)}'),
+              label: Text(
+                'Modifica giorno pesata (Attualmente è ${formatWeekday(profile.weighInWeekday)})',
+              ),
             ),
           ],
         ),
@@ -129,10 +135,19 @@ class _WeighInDayDialogState extends State<_WeighInDayDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Giorno della pesata'),
-      content: WeighInDayPicker(value: _day, onChanged: (day) => setState(() => _day = day)),
+      content: WeighInDayPicker(
+        value: _day,
+        onChanged: (day) => setState(() => _day = day),
+      ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Annulla')),
-        FilledButton(onPressed: () => Navigator.of(context).pop(_day), child: const Text('Salva')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annulla'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_day),
+          child: const Text('Salva'),
+        ),
       ],
     );
   }
@@ -170,7 +185,10 @@ class _NameDialogState extends State<_NameDialog> {
         onSubmitted: (_) => _save(),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Annulla')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annulla'),
+        ),
         FilledButton(onPressed: _save, child: const Text('Salva')),
       ],
     );

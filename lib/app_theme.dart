@@ -15,7 +15,7 @@ abstract final class AppTheme {
   /// Il testo normale resta nel font di sistema (SF su iPhone, Roboto su Android).
   static const displayFont = 'Barlow';
 
-  /// Il font del logo "myWorkout" nell'header (Russo One): squadrato e
+  /// Il font del logo "InScheda" nell'header (Russo One): squadrato e
   /// sportivo. Solo lì, così il logo si distingue dai titoli delle pagine.
   static const logoFont = 'RussoOne';
 

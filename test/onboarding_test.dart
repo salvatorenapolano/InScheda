@@ -193,7 +193,7 @@ void main() {
       await profile.completeOnboarding(name: 'Mario Rossi');
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Profilo'));
+      await tester.tap(find.byTooltip('Profilo e impostazioni'));
       await tester.pumpAndSettle();
       expect(find.text('Mario Rossi'), findsOneWidget);
 
@@ -215,9 +215,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(profile.weighInWeekday, DateTime.friday);
 
-      await tester.tap(find.byTooltip('Profilo'));
+      await tester.tap(find.byTooltip('Profilo e impostazioni'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Pesata: ogni venerdì'));
+      await tester.tap(find.text('Modifica giorno pesata (Attualmente è venerdì)'));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(ChoiceChip, 'Lun'));
       await tester.pump();
@@ -225,7 +225,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(profile.weighInWeekday, DateTime.monday);
-      expect(find.text('Pesata: ogni lunedì'), findsOneWidget);
+      expect(find.text('Modifica giorno pesata (Attualmente è lunedì)'), findsOneWidget);
     });
 
     testWidgets("finito l'onboarding le tab sono vuote: niente dati di altri", (tester) async {
