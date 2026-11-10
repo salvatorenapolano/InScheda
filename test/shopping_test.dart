@@ -1,13 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
+
+import 'helpers/fixtures.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:my_workout/data/shopping_repository.dart';
 import 'package:my_workout/data/shopping_store.dart';
 
 void main() {
-  final json = File('assets/data/shopping.json').readAsStringSync();
+  final json = fixture('shopping.json');
 
   test('due liste, con sezioni e prodotti come nel PDF', () {
     final lists = ShoppingRepository.parse(json);

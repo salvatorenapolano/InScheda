@@ -22,12 +22,21 @@ class TodayBanner extends StatelessWidget {
     // I record (a, b, c) permettono di restituire più valori insieme.
     // Lo `switch` sceglie il caso giusto e li assegna in un colpo solo.
     final (IconData icon, String title, String subtitle, bool isToday) = switch (next) {
-      null => (
-          Icons.flag_outlined,
-          'Scheda terminata',
-          "L'ultima seduta era ${formatDayMonth(plan.endDate)}: è ora della prossima scheda.",
-          false,
-        ),
+      // Nessuna seduta: la scheda è finita, oppure non ha giorni.
+      null => switch (plan.endDate) {
+          final end? => (
+              Icons.flag_outlined,
+              'Scheda terminata',
+              "L'ultima seduta era ${formatDayMonth(end)}: è ora della prossima scheda.",
+              false,
+            ),
+          null => (
+              Icons.event_busy_outlined,
+              'Nessun allenamento in calendario',
+              'Scegli i giorni in cui ti alleni.',
+              false,
+            ),
+        },
       _ when DateUtils.isSameDay(next.date, now) => (
           Icons.fitness_center,
           'Oggi: ${plan.workoutById(next.workoutId).name}',

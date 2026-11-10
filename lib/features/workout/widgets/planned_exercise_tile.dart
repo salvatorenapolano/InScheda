@@ -30,14 +30,7 @@ class PlannedExerciseTile extends StatelessWidget {
   final String sectionTitle;
 
   /// Un "getter": si usa come un campo (_details) ma viene calcolato.
-  String get _details {
-    final sets = planned.sets;
-    final rest = planned.restSeconds;
-    return [
-      if (sets == null) planned.reps else '$sets × ${planned.reps}',
-      if (rest != null) 'rec. ${formatRest(rest)}',
-    ].join(' · ');
-  }
+  String get _details => formatPlanned(planned);
 
   @override
   Widget build(BuildContext context) {

@@ -64,10 +64,12 @@ class ExerciseDetailPage extends StatelessWidget {
             const SizedBox(height: 12),
             MuscleCard(exercise: exercise, asset: muscleAsset),
           ],
-          _Section(
-            title: 'Come si esegue',
-            child: Text(exercise.description, style: textTheme.bodyLarge),
-          ),
+          // Gli esercizi personali possono non avere una spiegazione.
+          if (exercise.description.isNotEmpty)
+            _Section(
+              title: 'Come si esegue',
+              child: Text(exercise.description, style: textTheme.bodyLarge),
+            ),
           if (exercise.tips.isNotEmpty)
             _Section(
               title: 'Consigli',
@@ -115,10 +117,16 @@ class _PlanCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Il dato principale grande, nel font da tabellone.
-            Text(
-              sets == null ? planned.reps : '$sets serie × ${planned.reps}',
-              style: textTheme.headlineSmall,
-            ),
+            // Cardio: i minuti, e sotto come impostare la macchina.
+            if (planned.durationMinutes case final minutes?) ...[
+              Text('$minutes minuti', style: textTheme.headlineSmall),
+              if (formatCardioSettings(planned) case final settings?)
+                Text(settings, style: textTheme.bodyMedium?.copyWith(color: secondary)),
+            ] else
+              Text(
+                sets == null ? planned.reps : '$sets serie × ${planned.reps}',
+                style: textTheme.headlineSmall,
+              ),
             if (rest != null)
               Text('Recupero ${formatRest(rest)}', style: textTheme.bodyMedium?.copyWith(color: secondary)),
             if (notes != null) ...[

@@ -6,7 +6,9 @@ import 'package:my_workout/features/workout/widgets/planned_exercise_tile.dart';
 import 'package:my_workout/features/workout/widgets/step_number.dart';
 import 'package:my_workout/features/workout/widgets/today_banner.dart';
 import 'package:my_workout/utils/formatters.dart';
+import 'package:my_workout/models/workout_plan.dart';
 import 'package:my_workout/widgets/dividers.dart';
+import 'package:my_workout/widgets/empty_state.dart';
 import 'package:my_workout/widgets/main_app_bar.dart';
 
 /// Tab "Allenamento": cosa tocca oggi, scelta del giorno (Push/Pull/Legs)
@@ -23,7 +25,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   // Se lo scrivessimo dentro build() ripartirebbe a ogni ridisegno!
   // `late` = "inizializzalo la prima volta che lo uso" (cioè nel primo build,
   // dove `context` c'è già). DefaultAssetBundle.of(context) è il bundle dei
-  // dati: legge prima quelli scaricati da GitHub, poi quelli dell'app.
+  // dati: legge prima quelli dell'utente, poi quelli dell'app.
   late final Future<WorkoutData> _dataFuture =
       WorkoutRepository(bundle: DefaultAssetBundle.of(context)).load();
 
@@ -52,14 +54,23 @@ class _WorkoutPageState extends State<WorkoutPage> {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
-          return _buildContent(snapshot.requireData);
+          final data = snapshot.requireData;
+          // La libreria c'è sempre, la scheda no (primo avvio).
+          final plan = data.plan;
+          if (plan == null) {
+            return const EmptyState(
+              icon: Icons.fitness_center,
+              title: 'Nessuna scheda',
+              message: 'Qui vedrai i tuoi allenamenti, giorno per giorno, con gli esercizi e i pesi che usi.',
+            );
+          }
+          return _buildContent(data, plan);
         },
       ),
     );
   }
 
-  Widget _buildContent(WorkoutData data) {
-    final plan = data.plan;
+  Widget _buildContent(WorkoutData data, WorkoutPlan plan) {
     final now = DateTime.now();
     // La seduta di oggi (o la prossima, se oggi è riposo): all'apertura
     // il selettore parte proprio su quella scheda.
@@ -69,6 +80,14 @@ class _WorkoutPageState extends State<WorkoutPage> {
     final workout = plan.workoutById(
       _selectedWorkoutId ?? next?.workoutId ?? plan.workouts.first.id,
     );
+
+    // Riscaldamento, addominali e cardio sono facoltativi: i numeri delle
+    // parti (1, 2, 3...) si contano mentre le aggiungiamo, così restano
+    // in fila anche quando una parte manca.
+    final warmup = workout.warmup;
+    final abs = plan.abs;
+    final cardio = plan.cardio;
+    var step = 0;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
@@ -98,13 +117,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
         ),
         const SizedBox(height: 24),
 
-        // 1 · Riscaldamento: ogni giorno ha la sua mobilità.
-        ExerciseBlockTile(number: 1, block: workout.warmup, data: data),
-        const SizedBox(height: 24),
+        // Riscaldamento: ogni giorno ha la sua mobilità.
+        // `++step` aumenta il contatore e ne usa il nuovo valore.
+        if (warmup != null) ...[
+          ExerciseBlockTile(number: ++step, block: warmup, data: data),
+          const SizedBox(height: 24),
+        ],
 
-        // 2 · Pesi: sempre visibile, è la parte principale.
+        // Pesi: sempre visibile, è la parte principale.
         // Il titolo sta fuori dalla card, le righe dentro.
-        _SectionTitle(number: 2, text: 'Pesi · ${workout.name}'),
+        _SectionTitle(number: ++step, text: 'Pesi · ${workout.name}'),
         if (workout.intro case final intro?)
           // `case final intro?`: se intro non è null lo "estrae" in una
           // variabile già di tipo String. Se è null, la riga non c'è.
@@ -133,30 +155,34 @@ class _WorkoutPageState extends State<WorkoutPage> {
             ]),
           ),
         ),
-        const SizedBox(height: 24),
 
-        // 3 · Addominali
-        ExerciseBlockTile(number: 3, block: plan.abs, data: data),
-        const SizedBox(height: 12),
+        // Addominali
+        if (abs != null) ...[
+          const SizedBox(height: 24),
+          ExerciseBlockTile(number: ++step, block: abs, data: data),
+        ],
 
-        // 4 · Cardio: ⏱️ 30 min  ⛰️ 10%  💨 5,5 km/h
-        Card(
-          child: ListTile(
-            leading: const StepNumber(4),
-            title: Text(plan.cardio.title, style: Theme.of(context).textTheme.titleLarge),
-            // Wrap: i tre dati stanno su una riga e vanno a capo
-            // da soli se lo schermo è stretto.
-            subtitle: Wrap(
-              spacing: 16,
-              children: [
-                Text('⏱️ ${plan.cardio.durationMinutes} min'),
-                Text('⛰️ ${formatNumber(plan.cardio.inclinePercent)}%'),
-                Text('💨 ${formatNumber(plan.cardio.speedKmh)} km/h'),
-              ],
+        // Cardio: ⏱️ 30 min  ⛰️ 10%  💨 5,5 km/h
+        if (cardio != null) ...[
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: StepNumber(++step),
+              title: Text(cardio.title, style: Theme.of(context).textTheme.titleLarge),
+              // Wrap: i tre dati stanno su una riga e vanno a capo
+              // da soli se lo schermo è stretto.
+              subtitle: Wrap(
+                spacing: 16,
+                children: [
+                  Text('⏱️ ${cardio.durationMinutes} min'),
+                  Text('⛰️ ${formatNumber(cardio.inclinePercent)}%'),
+                  Text('💨 ${formatNumber(cardio.speedKmh)} km/h'),
+                ],
+              ),
+              trailing: const Icon(Icons.directions_walk),
             ),
-            trailing: const Icon(Icons.directions_walk),
           ),
-        ),
+        ],
       ],
     );
   }

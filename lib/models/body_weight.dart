@@ -22,8 +22,9 @@ class BodyWeightEntry {
       };
 }
 
-/// Il giorno della pesata: venerdì.
-const weighInWeekday = DateTime.friday;
+/// Il giorno della pesata se l'utente non ne sceglie un altro: venerdì.
+/// Quello vero sta nel profilo (ProfileStore.weighInWeekday).
+const defaultWeighInWeekday = DateTime.friday;
 
 /// Toglie ore e minuti: due pesate dello stesso giorno diventano uguali.
 DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
@@ -37,49 +38,55 @@ sealed class WeighInStatus {
   const WeighInStatus();
 }
 
-/// È venerdì e non ti sei ancora pesato.
+/// È il giorno della pesata e non ti sei ancora pesato.
 final class WeighInDueToday extends WeighInStatus {
   const WeighInDueToday();
 }
 
-/// È venerdì e la pesata di oggi c'è già.
+/// È il giorno della pesata e la pesata di oggi c'è già.
 final class WeighInDoneToday extends WeighInStatus {
   const WeighInDoneToday(this.kg);
   final double kg;
 }
 
-/// Venerdì è passato e da allora non hai segnato nessuna pesata.
+/// L'ultimo giorno della pesata è passato e da allora non hai segnato niente.
 final class WeighInMissed extends WeighInStatus {
   const WeighInMissed();
 }
 
-/// Tutto in regola: la prossima pesata è venerdì [date].
+/// Tutto in regola: la prossima pesata è il [date].
 final class WeighInUpcoming extends WeighInStatus {
   const WeighInUpcoming(this.date);
   final DateTime date;
 }
 
-/// Calcola lo stato a partire dalle pesate (dalla più recente) e da oggi.
-WeighInStatus weighInStatusFor(List<BodyWeightEntry> entries, DateTime now) {
+/// Calcola lo stato a partire dalle pesate (dalla più recente), da oggi e
+/// dal giorno della pesata ([weekday], 1 = lunedì … 7 = domenica).
+WeighInStatus weighInStatusFor(
+  List<BodyWeightEntry> entries,
+  DateTime now, {
+  int weekday = defaultWeighInWeekday,
+}) {
   final today = dateOnly(now);
   // firstOrNull: il primo elemento, oppure null se la lista è vuota.
   final latest = entries.firstOrNull;
 
-  if (today.weekday == weighInWeekday) {
+  if (today.weekday == weekday) {
     return latest != null && latest.date == today
         ? WeighInDoneToday(latest.kg)
         : const WeighInDueToday();
   }
 
-  // Quanti giorni fa era venerdì: sabato 1, domenica 2 … giovedì 6.
+  // Quanti giorni fa è stato il giorno della pesata. Col venerdì:
+  // sabato 1, domenica 2 … giovedì 6.
   // In Dart `%` con un divisore positivo dà sempre un risultato >= 0.
-  final daysSinceFriday = (today.weekday - weighInWeekday) % 7;
-  final lastFriday = DateTime(today.year, today.month, today.day - daysSinceFriday);
+  final daysSince = (today.weekday - weekday) % 7;
+  final lastWeighInDay = DateTime(today.year, today.month, today.day - daysSince);
 
   // Se non hai ancora nessuna pesata non ti "sei perso" niente:
-  // semplicemente si parte dal prossimo venerdì.
-  if (latest != null && latest.date.isBefore(lastFriday)) {
+  // semplicemente si parte dal prossimo giorno della pesata.
+  if (latest != null && latest.date.isBefore(lastWeighInDay)) {
     return const WeighInMissed();
   }
-  return WeighInUpcoming(DateTime(today.year, today.month, today.day + 7 - daysSinceFriday));
+  return WeighInUpcoming(DateTime(today.year, today.month, today.day + 7 - daysSince));
 }

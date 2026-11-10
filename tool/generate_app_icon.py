@@ -1,4 +1,7 @@
-"""Genera l'icona dell'app: un manubrio inclinato su gradiente petrolio.
+"""Genera l'icona dell'app: un manubrio inclinato su gradiente viola.
+
+Il colore segue AppTheme.seedColor (viola intenso #5B3FD1). Prima è stato
+verde petrolio e poi arancio: i vecchi colori sono nei commenti qui sotto.
 
 Il disegno viene dal canvas "Icona app myWorkout" fatto con Claude
 (tre varianti: chiara, scura e monocromatica). Qui lo ridisegniamo con
@@ -9,7 +12,7 @@ Poi:  dart run flutter_launcher_icons   (crea tutte le misure iOS e Android)
 
 File creati in assets/icon/:
 - app_icon.png             1024×1024, icona completa (iOS e Android "classico")
-- app_icon_dark.png        manubrio azzurro su trasparente (iOS 18, modalità scura:
+- app_icon_dark.png        manubrio viola su trasparente (iOS 18, modalità scura:
                            lo sfondo scuro lo mette il sistema)
 - app_icon_tinted.png      versione in scala di grigi (iOS 18, modalità "colorata")
 - app_icon_background.png  solo il gradiente (sfondo dell'icona adattiva Android)
@@ -43,8 +46,12 @@ SCALE = 0.86                  # quanto è grande il manubrio nell'icona completa
 
 # Le tre varianti del canvas: (sfondo basso-sinistra, sfondo alto-destra),
 # (manubrio sopra, manubrio sotto), (colore ombra, opacità ombra).
-LIGHT = dict(bg=("#04333D", "#1C8A92"), fg=("#FFFFFF", "#DDF0EF"), shadow=("#021C22", 0.35))
-DARK = dict(bg=("#091416", "#16292D"), fg=("#56C8CE", "#178790"), shadow=("#000000", 0.5))
+# Petrolio (prima): LIGHT bg ("#04333D", "#1C8A92"), fg ("#FFFFFF", "#DDF0EF"),
+# ombra "#021C22"; DARK bg ("#091416", "#16292D"), fg ("#56C8CE", "#178790").
+# Arancio (poi): LIGHT bg ("#7A2600", "#F07A24"), fg ("#FFFFFF", "#FFE4CF"),
+# ombra "#3D1300"; DARK fg ("#FF9B52", "#D9590B").
+LIGHT = dict(bg=("#24125E", "#7D5FF2"), fg=("#FFFFFF", "#E9E3FF"), shadow=("#120838", 0.35))
+DARK = dict(bg=("#0D0A1A", "#1E1736"), fg=("#B3A1FF", "#5B3FD1"), shadow=("#000000", 0.5))
 TINTED = dict(bg=("#000000", "#141414"), fg=("#FFFFFF", "#8C8C8C"), shadow=("#000000", 0.5))
 
 

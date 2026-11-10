@@ -20,7 +20,7 @@
         "title": "Riscaldamento",
         "durationMinutes": 10,
         "exercises": [
-          { "exerciseId": "cardio_riscaldamento", "reps": "5 minuti" },
+          { "exerciseId": "tapis_roulant", "durationMinutes": 5 },
           { "exerciseId": "dislocazioni_bastone", "reps": "10" },
           {
             "exerciseId": "rotazioni_braccia",
@@ -90,7 +90,7 @@
         "title": "Riscaldamento",
         "durationMinutes": 10,
         "exercises": [
-          { "exerciseId": "cardio_riscaldamento", "reps": "5 minuti" },
+          { "exerciseId": "tapis_roulant", "durationMinutes": 5 },
           { "exerciseId": "dislocazioni_bastone", "reps": "10" },
           { "exerciseId": "rotazioni_busto", "reps": "10 per lato" },
           { "exerciseId": "gatto_cammello", "reps": "10" },
@@ -158,7 +158,7 @@
         "title": "Riscaldamento",
         "durationMinutes": 10,
         "exercises": [
-          { "exerciseId": "cardio_riscaldamento", "reps": "5 minuti" },
+          { "exerciseId": "tapis_roulant", "durationMinutes": 5 },
           { "exerciseId": "squat_lento", "reps": "10" },
           { "exerciseId": "ponte_glutei", "reps": "12" },
           { "exerciseId": "good_morning_bastone", "reps": "10" },

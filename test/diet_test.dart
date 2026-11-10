@@ -1,12 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
+
+import 'helpers/fixtures.dart';
 
 import 'package:my_workout/data/diet_repository.dart';
 import 'package:my_workout/models/diet.dart';
 
 void main() {
-  final json = File('assets/data/diet.json').readAsStringSync();
+  final json = fixture('diet.json');
   final diet = DietRepository.parse(json);
 
   test('7 giorni, palestra lunedì mercoledì venerdì', () {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:my_workout/app_theme.dart';
 import 'package:my_workout/features/profile/profile_avatar.dart';
 import 'package:my_workout/features/profile/profile_sheet.dart';
 
@@ -23,11 +24,12 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       // Text.rich: un testo fatto di pezzi con stili diversi.
-      // "my" normale, "Workout" in grassetto col colore principale.
+      // Tutto in Russo One (il font del logo); "Workout" col colore principale.
       title: Text.rich(
         TextSpan(
+          style: const TextStyle(fontFamily: AppTheme.logoFont, fontWeight: FontWeight.w400),
           children: [
-            const TextSpan(text: 'my', style: TextStyle(fontWeight: FontWeight.w500)),
+            const TextSpan(text: 'my'),
             TextSpan(text: 'Workout', style: TextStyle(color: primary)),
           ],
         ),

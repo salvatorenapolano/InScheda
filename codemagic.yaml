@@ -1,37 +1,37 @@
-# Ricetta di compilazione per Codemagic (un Mac nel cloud).
+# Ricetta di compilazione per Codemagic (un computer nel cloud).
 #
-# Produce un file myWorkout.ipa NON firmato: la firma la mette Sideloadly
-# sul tuo PC con il tuo Apple ID, al momento dell'installazione.
-# Su Codemagic: Start new build → workflow "iOS per Sideloadly".
+# Produce l'APK Android (da installare o da mettere nelle Releases di
+# GitHub). Le build Android si possono fare anche sul PC con
+# `flutter build apk --release`: questa serve per averle uguali ogni volta.
+# Su Codemagic: Start new build → workflow "Android".
+#
+# ATTENZIONE: per ora l'APK è firmato con la chiave di debug (vedi
+# android/app/build.gradle.kts). Va bene per provarlo, non per il Play Store:
+# la firma di release la aggiungeremo con il workflow per l'AAB.
 
 workflows:
-  ios-sideload:
-    name: iOS per Sideloadly
+  android:
+    name: Android
+    # Il piano gratuito di Codemagic include i minuti sul Mac M2,
+    # che compila benissimo anche per Android.
     instance_type: mac_mini_m2
     max_build_duration: 30
     environment:
       flutter: stable
-      xcode: latest
-      cocoapods: default
+      # Il plugin Android di Gradle vuole Java 17.
+      java: 17
     scripts:
       - name: Scarica i pacchetti Dart
         script: flutter pub get
 
+      - name: Controlla il codice
+        script: flutter analyze
+
       - name: Esegui i test
         script: flutter test
 
-      # release: su iPhone una build "debug" non si apre senza debugger.
-      # --no-codesign: niente certificati qui, firma Sideloadly.
-      - name: Compila per iPhone
-        script: flutter build ios --release --no-codesign
-
-      # Un .ipa è solo uno zip con dentro la cartella Payload/Runner.app.
-      - name: Crea il file .ipa
-        script: |
-          rm -rf Payload myWorkout.ipa
-          mkdir Payload
-          cp -R build/ios/iphoneos/Runner.app Payload/
-          zip -qr myWorkout.ipa Payload
+      - name: Compila l'APK
+        script: flutter build apk --release
 
     artifacts:
-      - myWorkout.ipa
+      - build/app/outputs/flutter-apk/app-release.apk

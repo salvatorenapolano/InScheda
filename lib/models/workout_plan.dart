@@ -3,21 +3,29 @@
 class PlannedExercise {
   const PlannedExercise({
     required this.exerciseId,
-    required this.reps,
+    this.reps = '',
     this.sets,
     this.restSeconds,
     this.notes,
     this.alternatives = const [],
+    this.durationMinutes,
+    this.speedKmh,
+    this.inclinePercent,
+    this.level,
   });
 
   factory PlannedExercise.fromJson(Map<String, dynamic> json) {
     return PlannedExercise(
       exerciseId: json['exerciseId'] as String,
       sets: json['sets'] as int?,
-      reps: json['reps'] as String,
+      reps: json['reps'] as String? ?? '',
       restSeconds: json['restSeconds'] as int?,
       notes: json['notes'] as String?,
       alternatives: List<String>.from(json['alternatives'] as List? ?? const []),
+      durationMinutes: json['durationMinutes'] as int?,
+      speedKmh: (json['speedKmh'] as num?)?.toDouble(),
+      inclinePercent: (json['inclinePercent'] as num?)?.toDouble(),
+      level: json['level'] as int?,
     );
   }
 
@@ -27,6 +35,7 @@ class PlannedExercise {
   final int? sets;
 
   /// Testo e non numero: può essere "10–12", "30\"", "10 per lato"...
+  /// '' negli esercizi cardio, che si misurano in minuti.
   final String reps;
 
   final int? restSeconds;
@@ -34,6 +43,34 @@ class PlannedExercise {
 
   /// Cosa fare se la macchina è occupata.
   final List<String> alternatives;
+
+  // Solo per il cardio (tapis roulant, cyclette...): quanto dura e come si
+  // imposta la macchina. null = non indicato.
+  final int? durationMinutes;
+  final double? speedKmh;
+  final double? inclinePercent;
+  final int? level;
+
+  /// true se è un esercizio cardio (si misura in minuti).
+  bool get isCardio => durationMinutes != null;
+
+  /// Il contrario di fromJson: da oggetto a mappa, pronta per jsonEncode().
+  ///
+  /// `if (sets != null) 'sets': sets` è un "collection if": la chiave
+  /// finisce nella mappa solo se la condizione è vera. Così il JSON
+  /// salvato resta pulito, senza tanti `"notes": null`.
+  Map<String, dynamic> toJson() => {
+        'exerciseId': exerciseId,
+        if (sets != null) 'sets': sets,
+        if (reps.isNotEmpty) 'reps': reps,
+        if (restSeconds != null) 'restSeconds': restSeconds,
+        if (notes != null) 'notes': notes,
+        if (alternatives.isNotEmpty) 'alternatives': alternatives,
+        if (durationMinutes != null) 'durationMinutes': durationMinutes,
+        if (speedKmh != null) 'speedKmh': speedKmh,
+        if (inclinePercent != null) 'inclinePercent': inclinePercent,
+        if (level != null) 'level': level,
+      };
 }
 
 /// Trasforma una lista JSON in una lista di [PlannedExercise].
@@ -43,14 +80,24 @@ List<PlannedExercise> _plannedExercisesFromJson(Object? json) {
       .toList();
 }
 
-/// Un giorno della scheda (Push, Pull, Legs): il suo riscaldamento e i pesi.
-/// Addominali e cardio sono uguali per tutti e stanno in [WorkoutPlan].
+/// Il contrario: una lista di [PlannedExercise] in una lista JSON.
+List<Map<String, dynamic>> _plannedExercisesToJson(List<PlannedExercise> exercises) {
+  return [for (final exercise in exercises) exercise.toJson()];
+}
+
+/// Legge un blocco facoltativo: se nel JSON non c'è, resta null.
+ExerciseBlock? _blockFromJson(Object? json) {
+  return json == null ? null : ExerciseBlock.fromJson(json as Map<String, dynamic>);
+}
+
+/// Un giorno della scheda (Push, Pull, Legs... o il nome che preferisci):
+/// il suo eventuale riscaldamento e gli esercizi.
 class Workout {
   const Workout({
     required this.id,
     required this.name,
-    required this.warmup,
     required this.exercises,
+    this.warmup,
     this.focus,
     this.intro,
   });
@@ -61,7 +108,7 @@ class Workout {
       name: json['name'] as String,
       focus: json['focus'] as String?,
       intro: json['intro'] as String?,
-      warmup: ExerciseBlock.fromJson(json['warmup'] as Map<String, dynamic>),
+      warmup: _blockFromJson(json['warmup']),
       exercises: _plannedExercisesFromJson(json['exercises']),
     );
   }
@@ -75,11 +122,23 @@ class Workout {
   /// Una riga sotto il titolo dei pesi: "20 serie. Prima la schiena…".
   final String? intro;
 
-  final ExerciseBlock warmup;
+  /// null = questa scheda non ha un blocco di riscaldamento.
+  final ExerciseBlock? warmup;
   final List<PlannedExercise> exercises;
 
   /// Tutti gli esercizi del giorno, riscaldamento compreso.
-  List<PlannedExercise> get allPlannedExercises => [...warmup.exercises, ...exercises];
+  /// `...?` (spread "null-aware"): se warmup è null non aggiunge niente.
+  List<PlannedExercise> get allPlannedExercises => [...?warmup?.exercises, ...exercises];
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        if (focus != null) 'focus': focus,
+        if (intro != null) 'intro': intro,
+        // `?.`: chiama toJson() solo se warmup non è null.
+        if (warmup != null) 'warmup': warmup?.toJson(),
+        'exercises': _plannedExercisesToJson(exercises),
+      };
 }
 
 /// Un blocco della seduta fatto di esercizi: riscaldamento o addominali.
@@ -106,6 +165,13 @@ class ExerciseBlock {
   final int? durationMinutes;
   final String? intro;
   final List<PlannedExercise> exercises;
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        if (durationMinutes != null) 'durationMinutes': durationMinutes,
+        if (intro != null) 'intro': intro,
+        'exercises': _plannedExercisesToJson(exercises),
+      };
 }
 
 /// Il blocco cardio dopo gli addominali (camminata sul tapis roulant).
@@ -135,27 +201,43 @@ class CardioBlock {
 
   /// Velocità in km/h.
   final double speedKmh;
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'durationMinutes': durationMinutes,
+        'inclinePercent': inclinePercent,
+        'speedKmh': speedKmh,
+      };
 }
 
 /// La regola del calendario: in quali giorni ci si allena e in che ordine
 /// si alternano le schede.
 class Schedule {
-  const Schedule({required this.weekdays, required this.time, required this.rotation});
+  const Schedule({required this.weekdays, this.time, this.rotation = const []});
 
   factory Schedule.fromJson(Map<String, dynamic> json) {
     return Schedule(
       weekdays: List<int>.from(json['weekdays'] as List),
-      time: json['time'] as String,
-      rotation: List<String>.from(json['rotation'] as List),
+      time: json['time'] as String?,
+      rotation: List<String>.from(json['rotation'] as List? ?? const []),
     );
   }
 
   /// Giorni della settimana come in Dart: 1 = lunedì ... 7 = domenica.
   final List<int> weekdays;
-  final String time;
+
+  /// L'orario ("15:00"). Facoltativo: l'app non lo mostra.
+  final String? time;
 
   /// Ordine delle schede, ad esempio ["push", "pull", "legs"].
+  /// Vuota = nell'ordine in cui sono scritte (vedi [WorkoutPlan.rotation]).
   final List<String> rotation;
+
+  Map<String, dynamic> toJson() => {
+        'weekdays': weekdays,
+        if (time != null) 'time': time,
+        if (rotation.isNotEmpty) 'rotation': rotation,
+      };
 }
 
 /// Una seduta nel calendario: un giorno e la scheda da fare.
@@ -167,73 +249,99 @@ class ScheduledSession {
 }
 
 /// L'intera scheda (workout_plan.json).
+///
+/// Può essere quella completa del PT (riscaldamento, addominali, cardio,
+/// date di inizio e fine) o una creata nell'app, più semplice: solo le
+/// schede con i loro esercizi, i giorni e magari una data di fine.
 class WorkoutPlan {
   const WorkoutPlan({
     required this.name,
-    required this.version,
     required this.startDate,
-    required this.endDate,
     required this.schedule,
-    required this.generalNotes,
     required this.workouts,
-    required this.abs,
-    required this.cardio,
+    this.endDate,
+    this.version,
+    this.generalNotes,
+    this.abs,
+    this.cardio,
   });
 
   factory WorkoutPlan.fromJson(Map<String, dynamic> json) {
+    final endDate = json['endDate'] as String?;
+    final cardio = json['cardio'];
     return WorkoutPlan(
       name: json['name'] as String,
-      version: json['version'] as String,
+      version: json['version'] as String?,
       // "2026-10-19" diventa la mezzanotte di quel giorno, ora locale.
       startDate: DateTime.parse(json['startDate'] as String),
-      endDate: DateTime.parse(json['endDate'] as String),
+      endDate: endDate == null ? null : DateTime.parse(endDate),
       schedule: Schedule.fromJson(json['schedule'] as Map<String, dynamic>),
-      generalNotes: json['generalNotes'] as String,
+      generalNotes: json['generalNotes'] as String?,
       workouts: (json['workouts'] as List)
           .map((item) => Workout.fromJson(item as Map<String, dynamic>))
           .toList(),
-      abs: ExerciseBlock.fromJson(json['abs'] as Map<String, dynamic>),
-      cardio: CardioBlock.fromJson(json['cardio'] as Map<String, dynamic>),
+      abs: _blockFromJson(json['abs']),
+      cardio: cardio == null ? null : CardioBlock.fromJson(cardio as Map<String, dynamic>),
     );
   }
 
   final String name;
-  final String version;
+  final String? version;
+
+  /// Da quando conta il calendario: la prima seduta è il primo giorno di
+  /// allenamento da qui in poi.
   final DateTime startDate;
-  final DateTime endDate;
+
+  /// null = la scheda non ha una scadenza: le sedute continuano per sempre.
+  final DateTime? endDate;
   final Schedule schedule;
-  final String generalNotes;
+  final String? generalNotes;
   final List<Workout> workouts;
 
   /// Gli addominali, dopo i pesi e prima della camminata: uguali tutti i giorni.
-  final ExerciseBlock abs;
-  final CardioBlock cardio;
+  /// null = la scheda non ha questo blocco.
+  final ExerciseBlock? abs;
+  final CardioBlock? cardio;
 
   Workout workoutById(String id) => workouts.firstWhere((w) => w.id == id);
+
+  /// L'ordine delle schede: quello del calendario, oppure quello in cui
+  /// sono scritte se il calendario non lo dice.
+  List<String> get rotation =>
+      schedule.rotation.isNotEmpty ? schedule.rotation : [for (final w in workouts) w.id];
 
   /// Tutti gli esercizi della scheda, da tutti i blocchi.
   List<PlannedExercise> get allPlannedExercises => [
         for (final workout in workouts) ...workout.allPlannedExercises,
-        ...abs.exercises,
+        ...?abs?.exercises,
       ];
 
-  /// Tutte le sedute dal primo all'ultimo giorno, ciascuna con la sua scheda.
-  List<ScheduledSession> get sessions {
-    final result = <ScheduledSession>[];
+  /// Le sedute dal primo giorno in poi, ciascuna con la sua scheda.
+  ///
+  /// `sync*` crea un generatore: ogni `yield` "consegna" una seduta solo
+  /// quando chi legge ne chiede un'altra. Per questo funziona anche senza
+  /// data di fine (le sedute sarebbero infinite!): nextSessionFrom() si
+  /// ferma alla prima che gli serve e il resto non viene mai calcolato.
+  Iterable<ScheduledSession> get sessions sync* {
+    final order = rotation;
+    // Senza giorni o senza schede non c'è nessuna seduta (e il ciclo
+    // qui sotto, senza data di fine, non finirebbe mai).
+    if (schedule.weekdays.isEmpty || order.isEmpty) return;
+    final end = endDate;
+    var count = 0;
     var day = startDate;
-    while (!day.isAfter(endDate)) {
+    while (end == null || !day.isAfter(end)) {
       if (schedule.weekdays.contains(day.weekday)) {
-        // La 1ª seduta prende rotation[0], la 2ª rotation[1], la 3ª di nuovo
-        // rotation[0]... L'operatore % (modulo) fa ripartire il giro.
-        final workoutId = schedule.rotation[result.length % schedule.rotation.length];
-        result.add(ScheduledSession(date: day, workoutId: workoutId));
+        // La 1ª seduta prende order[0], la 2ª order[1], la 3ª di nuovo
+        // order[0]... L'operatore % (modulo) fa ripartire il giro.
+        yield ScheduledSession(date: day, workoutId: order[count % order.length]);
+        count++;
       }
       // Non usiamo day.add(Duration(days: 1)): col cambio dell'ora legale
       // (25 ottobre!) un giorno dura 23 o 25 ore e si sballerebbe tutto.
       // Così invece si va sempre al giorno successivo del calendario.
       day = DateTime(day.year, day.month, day.day + 1);
     }
-    return result;
   }
 
   /// La prima seduta da [from] in poi, oggi compreso.
@@ -245,4 +353,24 @@ class WorkoutPlan {
     }
     return null;
   }
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        if (version != null) 'version': version,
+        'startDate': _formatDate(startDate),
+        if (endDate case final end?) 'endDate': _formatDate(end),
+        'schedule': schedule.toJson(),
+        if (generalNotes != null) 'generalNotes': generalNotes,
+        'workouts': [for (final workout in workouts) workout.toJson()],
+        if (abs != null) 'abs': abs?.toJson(),
+        if (cardio != null) 'cardio': cardio?.toJson(),
+      };
+}
+
+/// 16 novembre 2026 → "2026-11-16", lo stesso formato che legge DateTime.parse.
+/// padLeft(2, '0') aggiunge lo zero davanti: 3 → "03".
+String _formatDate(DateTime date) {
+  final month = date.month.toString().padLeft(2, '0');
+  final day = date.day.toString().padLeft(2, '0');
+  return '${date.year}-$month-$day';
 }

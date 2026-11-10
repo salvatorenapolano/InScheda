@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:my_workout/data/diet_repository.dart';
+import 'package:my_workout/features/diet_editor/diet_editor_page.dart';
 import 'package:my_workout/features/diet/widgets/diet_day_view.dart';
 import 'package:my_workout/models/diet.dart';
+import 'package:my_workout/widgets/empty_state.dart';
 import 'package:my_workout/widgets/main_app_bar.dart';
 
 /// Tab "Dieta": la settimana tipo, un giorno per scheda (Lun … Dom).
@@ -14,21 +16,36 @@ class DietPage extends StatefulWidget {
 }
 
 class _DietPageState extends State<DietPage> {
-  // Il bundle dei dati: prima quelli scaricati da GitHub, poi quelli dell'app.
-  late final Future<Diet> _dietFuture = DietRepository(bundle: DefaultAssetBundle.of(context)).load();
+  // Il bundle dei dati: prima quelli dell'utente, poi quelli dell'app.
+  // Diet? perché l'utente può non avere ancora una dieta.
+  late final Future<Diet?> _dietFuture = DietRepository(bundle: DefaultAssetBundle.of(context)).load();
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Diet>(
+    return FutureBuilder<Diet?>(
       future: _dietFuture,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _simplePage(Text('Non riesco a leggere la dieta:\n${snapshot.error}'));
         }
-        if (!snapshot.hasData) {
+        // hasData è false anche quando il risultato è null: per sapere se
+        // il caricamento è finito guardiamo connectionState.
+        if (snapshot.connectionState != ConnectionState.done) {
           return _simplePage(const CircularProgressIndicator());
         }
-        return _buildWeek(snapshot.requireData);
+        final diet = snapshot.data;
+        if (diet == null) {
+          return _simplePage(EmptyState(
+            icon: Icons.restaurant_menu,
+            title: 'Nessuna dieta',
+            message: 'Qui vedrai la settimana dei pasti, giorno per giorno.',
+            actionLabel: 'Crea la dieta',
+            onAction: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const DietEditorPage()),
+            ),
+          ));
+        }
+        return _buildWeek(diet);
       },
     );
   }

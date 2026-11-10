@@ -7,12 +7,17 @@ import 'package:flutter/material.dart';
 /// aggiorna tutta l'app in un colpo solo.
 abstract final class AppTheme {
   // Il colore "seme": Material 3 ne ricava da solo tutta la palette.
-  // Verde petrolio: calmo, e non litiga coi badge colorati degli esercizi.
-  static const seedColor = Color(0xFF0E7C86);
+  // Viola intenso: moderno e deciso. Colori provati prima: verde petrolio
+  // 0xFF0E7C86 e arancio energia 0xFFD9590B (basta rimetterne uno).
+  static const seedColor = Color(0xFF5B3FD1);
 
   /// Il font "da tabellone" per titoli e numeri (dichiarato nel pubspec).
   /// Il testo normale resta nel font di sistema (SF su iPhone, Roboto su Android).
   static const displayFont = 'Barlow';
+
+  /// Il font del logo "myWorkout" nell'header (Russo One): squadrato e
+  /// sportivo. Solo lì, così il logo si distingue dai titoli delle pagine.
+  static const logoFont = 'RussoOne';
 
   // I raggi degli angoli, dal più grande al più piccolo: più un elemento
   // è importante (o contiene altro), più è arrotondato.
@@ -27,7 +32,7 @@ abstract final class AppTheme {
     final isLight = brightness == Brightness.light;
 
     // DynamicSchemeVariant.fidelity: la palette resta fedele al seme.
-    // Quella predefinita (tonalSpot) lo "smorza" e il petrolio esce grigiastro.
+    // Quella predefinita (tonalSpot) lo "smorza" e il viola esce spento.
     final colors = ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: brightness,

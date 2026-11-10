@@ -1,21 +1,29 @@
 import 'package:my_workout/utils/formatters.dart';
 
-/// Un alimento del catalogo: nome e reparto del supermercato.
-/// Il reparto servirà per raggruppare la lista della spesa.
+/// Un alimento del catalogo: nome e (se c'è) reparto del supermercato.
 class Food {
-  const Food({required this.id, required this.name, required this.category});
+  const Food({required this.id, required this.name, this.category});
 
   factory Food.fromJson(Map<String, dynamic> json) {
     return Food(
       id: json['id'] as String,
       name: json['name'] as String,
-      category: json['category'] as String,
+      category: json['category'] as String?,
     );
   }
 
   final String id;
   final String name;
-  final String category;
+
+  /// Il reparto ("Frigo", "Dispensa"...). null negli alimenti scritti
+  /// nell'editor, che non lo chiede.
+  final String? category;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        if (category != null) 'category': category,
+      };
 }
 
 /// Un ingrediente di un pasto: quale alimento e quanto.
@@ -58,6 +66,14 @@ class MealItem {
     final range = max == null ? formatNumber(q) : '${formatNumber(q)}–${formatNumber(max)}';
     return unit == null ? range : '$range $unit';
   }
+
+  Map<String, dynamic> toJson() => {
+        'foodId': foodId,
+        if (quantity != null) 'quantity': quantity,
+        if (quantityMax != null) 'quantityMax': quantityMax,
+        if (unit != null) 'unit': unit,
+        if (note != null) 'note': note,
+      };
 }
 
 /// Un momento della giornata: pranzo, cena...
@@ -82,6 +98,13 @@ class MealSlot {
 
   /// "Pranzo · 13:00"
   String get label => time == null ? name : '$name · $time';
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        if (time != null) 'time': time,
+        if (emoji != null) 'emoji': emoji,
+      };
 }
 
 /// Un pasto. Di solito ha degli ingredienti, ma può anche essere
@@ -89,7 +112,7 @@ class MealSlot {
 class Meal {
   const Meal({
     required this.slotId,
-    required this.title,
+    this.title = '',
     this.items = const [],
     this.description,
     this.alternative,
@@ -99,7 +122,7 @@ class Meal {
   factory Meal.fromJson(Map<String, dynamic> json) {
     return Meal(
       slotId: json['slot'] as String,
-      title: json['title'] as String,
+      title: json['title'] as String? ?? '',
       items: (json['items'] as List? ?? const [])
           .map((item) => MealItem.fromJson(item as Map<String, dynamic>))
           .toList(),
@@ -110,6 +133,8 @@ class Meal {
   }
 
   final String slotId;
+
+  /// Il nome del piatto ("Pasta al tonno"). '' = nessun nome, solo ingredienti.
   final String title;
   final List<MealItem> items;
   final String? description;
@@ -117,6 +142,15 @@ class Meal {
   /// "Se manca il salmone: ..."
   final String? alternative;
   final List<String> rules;
+
+  Map<String, dynamic> toJson() => {
+        'slot': slotId,
+        if (title.isNotEmpty) 'title': title,
+        if (items.isNotEmpty) 'items': [for (final item in items) item.toJson()],
+        if (description != null) 'description': description,
+        if (alternative != null) 'alternative': alternative,
+        if (rules.isNotEmpty) 'rules': rules,
+      };
 }
 
 /// Un giorno della settimana tipo.
@@ -126,7 +160,7 @@ class DietDay {
   factory DietDay.fromJson(Map<String, dynamic> json) {
     return DietDay(
       name: json['name'] as String,
-      training: json['training'] as bool,
+      training: json['training'] as bool? ?? false,
       meals: (json['meals'] as List)
           .map((item) => Meal.fromJson(item as Map<String, dynamic>))
           .toList(),
@@ -143,6 +177,12 @@ class DietDay {
   String get shortName => name.substring(0, 3);
 
   bool usesFood(String foodId) => meals.any((m) => m.items.any((i) => i.foodId == foodId));
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'training': training,
+        'meals': [for (final meal in meals) meal.toJson()],
+      };
 }
 
 /// Il riquadro "I legumi a scelta".
@@ -160,50 +200,61 @@ class LegumesInfo {
   final String title;
   final String description;
   final List<String> options;
+
+  Map<String, dynamic> toJson() => {'title': title, 'description': description, 'options': options};
 }
 
 /// L'intera dieta (diet.json).
+///
+/// Può essere quella completa del nutrizionista (reparti, legumi, note) o
+/// una scritta nell'editor dell'app: solo i momenti, i giorni e i pasti.
 class Diet {
   const Diet({
     required this.name,
-    required this.version,
     required this.slots,
-    required this.categories,
     required this.foods,
     required this.days,
-    required this.legumes,
-    required this.notes,
+    this.version,
+    this.categories = const [],
+    this.legumes,
+    this.notes = const [],
   });
 
   factory Diet.fromJson(Map<String, dynamic> json) {
     final foodList = (json['foods'] as List)
         .map((item) => Food.fromJson(item as Map<String, dynamic>));
+    final legumes = json['legumes'];
     return Diet(
       name: json['name'] as String,
-      version: json['version'] as String,
+      version: json['version'] as String?,
       slots: {
         for (final item in json['slots'] as List)
           (item as Map<String, dynamic>)['id'] as String: MealSlot.fromJson(item),
       },
-      categories: List<String>.from(json['categories'] as List),
+      categories: List<String>.from(json['categories'] as List? ?? const []),
       foods: {for (final food in foodList) food.id: food},
       days: (json['days'] as List)
           .map((item) => DietDay.fromJson(item as Map<String, dynamic>))
           .toList(),
-      legumes: LegumesInfo.fromJson(json['legumes'] as Map<String, dynamic>),
-      notes: List<String>.from(json['notes'] as List),
+      legumes: legumes == null ? null : LegumesInfo.fromJson(legumes as Map<String, dynamic>),
+      notes: List<String>.from(json['notes'] as List? ?? const []),
     );
   }
 
   final String name;
-  final String version;
+  final String? version;
+
+  /// I momenti della giornata per id. Una Map in Dart ricorda l'ordine
+  /// di inserimento: è l'ordine in cui li mostra l'editor.
   final Map<String, MealSlot> slots;
 
   /// I reparti del supermercato, nell'ordine in cui li incontri.
   final List<String> categories;
   final Map<String, Food> foods;
   final List<DietDay> days;
-  final LegumesInfo legumes;
+
+  /// null = niente riquadro dei legumi.
+  final LegumesInfo? legumes;
   final List<String> notes;
 
   Food foodFor(MealItem item) => foods[item.foodId]!;
@@ -220,7 +271,19 @@ class Diet {
             if (!foods.containsKey(item.foodId)) '${day.name}: alimento "${item.foodId}" non nel catalogo',
         ],
       for (final food in foods.values)
-        if (!categories.contains(food.category)) '${food.name}: reparto "${food.category}" sconosciuto',
+        if (food.category case final category? when !categories.contains(category))
+          '${food.name}: reparto "$category" sconosciuto',
     ];
   }
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        if (version != null) 'version': version,
+        'slots': [for (final slot in slots.values) slot.toJson()],
+        if (categories.isNotEmpty) 'categories': categories,
+        'foods': [for (final food in foods.values) food.toJson()],
+        'days': [for (final day in days) day.toJson()],
+        if (legumes case final legumes?) 'legumes': legumes.toJson(),
+        if (notes.isNotEmpty) 'notes': notes,
+      };
 }

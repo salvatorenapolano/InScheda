@@ -5,7 +5,7 @@ import 'package:my_workout/app_theme.dart';
 /// Il riquadro grande in cima alle pagine ("Oggi: Scheda A",
 /// "Oggi ti devi pesare"...).
 ///
-/// Quando [highlighted] è true è petrolio pieno (c'è qualcosa da fare oggi),
+/// Quando [highlighted] è true ha il colore principale pieno (c'è qualcosa da fare oggi),
 /// altrimenti è neutro, col colore delle card e un bordo sottile.
 /// Lo usano sia la tab Allenamento sia la tab Pesata: stesso aspetto,
 /// contenuti diversi.
@@ -38,8 +38,8 @@ class StatusBanner extends StatelessWidget {
     final colors = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    // In tema scuro il "primary" è un azzurro chiaro: per restare sul
-    // petrolio scuro usiamo primaryContainer (e il suo colore di testo).
+    // In tema scuro il "primary" è una versione chiara del seme: per avere
+    // un colore pieno e scuro usiamo primaryContainer (e il suo testo).
     final dark = theme.brightness == Brightness.dark;
     final highlightBackground = dark ? colors.primaryContainer : colors.primary;
     final onHighlight = dark ? colors.onPrimaryContainer : colors.onPrimary;

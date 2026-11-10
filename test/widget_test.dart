@@ -7,16 +7,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:my_workout/app.dart';
 import 'package:my_workout/data/body_weight_store.dart';
-import 'package:my_workout/data/remote_data.dart';
+import 'package:my_workout/data/profile_store.dart';
 import 'package:my_workout/data/shopping_store.dart';
+import 'package:my_workout/data/user_data_store.dart';
 import 'package:my_workout/data/weight_store.dart';
 import 'package:my_workout/features/workout/widgets/exercise_media.dart';
+
+import 'helpers/fixtures.dart';
 
 void main() {
   late WeightStore weights;
   late BodyWeightStore bodyWeights;
   late ShoppingStore shopping;
-  late DataStore data;
+  late ProfileStore profile;
+  late UserDataStore userData;
+  // Scheda, dieta e spesa di prova al posto degli asset (l'app non le ha più).
+  final assets = FixtureBundle();
 
   // Nei test non c'è una WebView: niente player YouTube, solo l'anteprima.
   setUpAll(() => ExerciseMedia.videoEnabled = false);
@@ -26,16 +32,22 @@ void main() {
     // ha il suo "tempo finto": un caricamento iniziato nel test precedente
     // non si completerebbe mai in quello dopo. Svuotiamo la cache ogni volta.
     rootBundle.clear();
-    SharedPreferences.setMockInitialValues({'weight_hack_squat': 16.0});
+    // Onboarding già fatto: questi test partono direttamente dalle tab.
+    SharedPreferences.setMockInitialValues({
+      'weight_hack_squat': 16.0,
+      'onboarding_done': true,
+      'profile_name': 'Mario Rossi',
+    });
     weights = await WeightStore.load();
     bodyWeights = await BodyWeightStore.load();
     shopping = await ShoppingStore.load();
-    // Una cartella vuota: nessun dato scaricato, l'app usa i suoi asset.
-    data = DataStore(root: Directory.systemTemp.createTempSync('my_workout_dati'));
+    profile = await ProfileStore.load();
+    // Nessuna scheda dell'utente: si vede quella di esempio.
+    userData = UserDataStore(root: Directory.systemTemp.createTempSync('my_workout_utente'));
   });
 
   testWidgets('La tab Allenamento mostra la scheda dal JSON', (tester) async {
-    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, data: data));
+    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, profile: profile, userData: userData, assets: assets));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Push'));
@@ -55,7 +67,7 @@ void main() {
   });
 
   testWidgets('Nel dettaglio il peso cambia e la lista si aggiorna', (tester) async {
-    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, data: data));
+    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, profile: profile, userData: userData, assets: assets));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Legs'));
     await tester.pumpAndSettle();
@@ -88,7 +100,9 @@ void main() {
     await tester.tap(find.text('Tocca per ingrandire'));
     await tester.pumpAndSettle();
     expect(find.byType(InteractiveViewer), findsOneWidget);
-    await tester.pageBack();
+    // pageBack() cerca il tooltip inglese "Back": con l'app in italiano
+    // è "Indietro", quindi tocchiamo direttamente il BackButton.
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
 
     // La pagina è lunga: scorro finché compare la spiegazione.
@@ -96,29 +110,30 @@ void main() {
     expect(find.text('Come si esegue'), findsOneWidget);
 
     // Torno indietro: la riga nella lista mostra il nuovo peso.
-    await tester.pageBack();
+    // pageBack() cerca il tooltip inglese "Back": con l'app in italiano
+    // è "Indietro", quindi tocchiamo direttamente il BackButton.
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('22,5 kg'), findsOneWidget);
     expect(weights.weightFor('hack_squat'), 22.5);
   });
 
-  testWidgets("L'header ha il nome dell'app e il profilo apre i dati", (tester) async {
-    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, data: data));
+  testWidgets("L'header ha il nome dell'app e il profilo mostra il nome", (tester) async {
+    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, profile: profile, userData: userData, assets: assets));
     await tester.pumpAndSettle();
     expect(find.text('myWorkout'), findsOneWidget);
-    expect(find.text('SN'), findsOneWidget);
+    expect(find.text('MR'), findsOneWidget);
 
-    // Tocco il cerchio: si apre il pannello dal basso.
+    // Tocco il cerchio: si apre il pannello dal basso, col nome.
     await tester.tap(find.byTooltip('Profilo'));
     await tester.pumpAndSettle();
-    expect(find.text('Scarica gli ultimi dati'), findsOneWidget);
-    expect(find.textContaining('installata'), findsOneWidget);
-    // Senza dati scaricati non c'è niente a cui tornare.
-    expect(find.text("Torna ai dati dell'app"), findsNothing);
+    expect(find.text('Mario Rossi'), findsOneWidget);
+    // Il download da GitHub non c'è più.
+    expect(find.text('Scarica gli ultimi dati'), findsNothing);
   });
 
   testWidgets('La barra in basso cambia pagina', (tester) async {
-    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, data: data));
+    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, profile: profile, userData: userData, assets: assets));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.restaurant_menu_outlined));
@@ -137,7 +152,7 @@ void main() {
   });
 
   testWidgets('Tab Pesata: aggiungo, correggo e cancello una pesata', (tester) async {
-    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, data: data));
+    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, profile: profile, userData: userData, assets: assets));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.monitor_weight_outlined));
@@ -171,7 +186,7 @@ void main() {
   });
 
   testWidgets('Tab Spesa: spunto, Reset e Annulla', (tester) async {
-    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, data: data));
+    await tester.pumpWidget(MyWorkoutApp(weights: weights, bodyWeights: bodyWeights, shopping: shopping, profile: profile, userData: userData, assets: assets));
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.shopping_cart_outlined));
     await tester.pumpAndSettle();

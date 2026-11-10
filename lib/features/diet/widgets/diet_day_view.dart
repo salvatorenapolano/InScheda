@@ -24,13 +24,23 @@ class DietDayView extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
+        if (day.meals.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Text(
+              'Nessun pasto segnato per questo giorno.',
+              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              textAlign: TextAlign.center,
+            ),
+          ),
         for (final meal in day.meals)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: MealCard(diet: diet, meal: meal),
           ),
-        // Il riquadro dei legumi compare solo nei giorni che li usano.
-        if (day.usesFood('legumi')) _LegumesCard(info: diet.legumes),
+        // Il riquadro dei legumi compare solo nei giorni che li usano
+        // (e solo nelle diete che ce l'hanno: quelle dell'editor no).
+        if (diet.legumes case final legumes? when day.usesFood('legumi')) _LegumesCard(info: legumes),
         // Il riquadro "Da sapere" è stato tolto: le note (diet.notes)
         // restano nel JSON, pronte se un giorno vorrai rimetterle.
       ],

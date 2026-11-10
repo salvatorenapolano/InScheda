@@ -4,6 +4,7 @@ import 'package:my_workout/data/shopping_repository.dart';
 import 'package:my_workout/data/shopping_store.dart';
 import 'package:my_workout/models/shopping.dart';
 import 'package:my_workout/widgets/dividers.dart';
+import 'package:my_workout/widgets/empty_state.dart';
 import 'package:my_workout/widgets/main_app_bar.dart';
 
 /// Tab "Spesa": due schede (Settimanale, Mensile) con i prodotti da
@@ -16,20 +17,34 @@ class ShoppingPage extends StatefulWidget {
 }
 
 class _ShoppingPageState extends State<ShoppingPage> {
-  // Il bundle dei dati: prima quelli scaricati da GitHub, poi quelli dell'app.
-  late final Future<List<ShoppingList>> _listsFuture =
+  // Il bundle dei dati: prima quelli dell'utente, poi quelli dell'app.
+  // null = l'utente non ha ancora una lista.
+  late final Future<List<ShoppingList>?> _listsFuture =
       ShoppingRepository(bundle: DefaultAssetBundle.of(context)).load();
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ShoppingList>>(
+    return FutureBuilder<List<ShoppingList>?>(
       future: _listsFuture,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _simplePage(Text('Non riesco a leggere la lista della spesa:\n${snapshot.error}'));
         }
-        if (!snapshot.hasData) return _simplePage(const CircularProgressIndicator());
-        return _buildLists(snapshot.requireData);
+        // Come nella Dieta: con un risultato null hasData è false, quindi
+        // per il caricamento guardiamo connectionState.
+        if (snapshot.connectionState != ConnectionState.done) {
+          return _simplePage(const CircularProgressIndicator());
+        }
+        final lists = snapshot.data;
+        if (lists == null) {
+          return _simplePage(const EmptyState(
+            icon: Icons.shopping_cart_outlined,
+            title: 'Nessuna lista della spesa',
+            message: 'Qui vedrai i prodotti da comprare, da spuntare al supermercato. '
+                'Presto potrai inserirli dall\'app.',
+          ));
+        }
+        return _buildLists(lists);
       },
     );
   }

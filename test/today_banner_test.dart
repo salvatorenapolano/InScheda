@@ -3,14 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'helpers/fixtures.dart';
+
 import 'package:my_workout/data/workout_repository.dart';
 import 'package:my_workout/features/workout/widgets/today_banner.dart';
 
 void main() {
   final plan = WorkoutRepository.parse(
-    planJson: File('assets/data/workout_plan.json').readAsStringSync(),
+    planJson: fixture('workout_plan.json'),
     exercisesJson: File('assets/data/exercises.json').readAsStringSync(),
-  ).plan;
+  ).plan!;
 
   // Disegna solo il banner, fingendo che oggi sia `now`.
   Future<void> pumpBanner(WidgetTester tester, DateTime now) {

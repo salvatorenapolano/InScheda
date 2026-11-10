@@ -44,13 +44,16 @@ class MealCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  // textAlign serve se il titolo va a capo su più righe.
-                  Text(
-                    meal.title,
-                    style: theme.textTheme.titleLarge,
-                    textAlign: TextAlign.center,
-                  ),
+                  // Il nome del piatto è facoltativo: senza, solo il momento.
+                  if (meal.title.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    // textAlign serve se il titolo va a capo su più righe.
+                    Text(
+                      meal.title,
+                      style: theme.textTheme.titleLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ],
               ),
             ),

@@ -1,17 +1,21 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+
+import 'helpers/fixtures.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import 'package:my_workout/data/workout_repository.dart';
+import 'package:my_workout/models/exercise.dart';
 import 'package:my_workout/utils/formatters.dart';
 
 void main() {
   // Usiamo i file JSON veri: se li modifichi e rompi qualcosa, il test lo dice.
-  final planJson = File('assets/data/workout_plan.json').readAsStringSync();
+  final planJson = fixture('workout_plan.json');
   final exercisesJson = File('assets/data/exercises.json').readAsStringSync();
   final data = WorkoutRepository.parse(planJson: planJson, exercisesJson: exercisesJson);
-  final plan = data.plan;
+  // `!`: i dati di prova hanno sempre una scheda.
+  final plan = data.plan!;
 
   group('Lettura JSON', () {
     test('legge i tre giorni e i loro blocchi', () {
@@ -20,12 +24,12 @@ void main() {
       final push = plan.workoutById('push');
       expect(push.name, 'Push');
       expect(push.focus, 'Petto, spalle, tricipiti');
-      expect(push.warmup.exercises, hasLength(6));
+      expect(push.warmup!.exercises, hasLength(6));
       expect(push.exercises, hasLength(7));
       expect(data.exerciseFor(push.exercises.first).name, 'Chest press');
 
       // Ogni giorno ha il suo riscaldamento: il Legs parte dallo squat lento.
-      expect(plan.workoutById('legs').warmup.exercises[1].exerciseId, 'squat_lento');
+      expect(plan.workoutById('legs').warmup!.exercises[1].exerciseId, 'squat_lento');
       expect(plan.workoutById('legs').exercises, hasLength(8));
     });
 
@@ -39,13 +43,13 @@ void main() {
 
     test('addominali e cardio sono uguali tutti i giorni', () {
       expect(
-        plan.abs.exercises.map((p) => p.exerciseId),
+        plan.abs!.exercises.map((p) => p.exerciseId),
         ['crunch_macchina', 'plank', 'plank_laterale', 'leg_raise', 'heel_touch'],
       );
-      expect(plan.cardio.title, 'Cardio');
-      expect(plan.cardio.durationMinutes, 30);
-      expect(plan.cardio.inclinePercent, 10);
-      expect(plan.cardio.speedKmh, 5.5);
+      expect(plan.cardio!.title, 'Cardio');
+      expect(plan.cardio!.durationMinutes, 30);
+      expect(plan.cardio!.inclinePercent, 10);
+      expect(plan.cardio!.speedKmh, 5.5);
     });
 
     test('un id sbagliato dà un errore chiaro', () {
@@ -117,8 +121,8 @@ void main() {
 
   test('ogni esercizio ha un video YouTube valido e dei consigli', () {
     for (final e in data.exercises.values) {
-      // Il cardio leggero (cyclette o tapis roulant) non ha bisogno di video.
-      if (e.id == 'cardio_riscaldamento') continue;
+      // Le macchine cardio (tapis roulant, cyclette...) non hanno bisogno di video.
+      if (e.measure == ExerciseMeasure.cardio) continue;
       expect(e.videoUrl, isNotNull, reason: e.id);
       expect(YoutubePlayerController.convertUrlToId(e.videoUrl!), isNotNull, reason: e.id);
       expect(e.tips, isNotEmpty, reason: e.id);
@@ -133,16 +137,27 @@ void main() {
     expect(missing, isEmpty, reason: 'Rilancia tool/generate_exercise_previews.py');
   });
 
-  test('ogni esercizio della libreria è usato nella scheda', () {
-    final used = plan.allPlannedExercises.map((p) => p.exerciseId).toSet();
-    expect(data.exercises.keys.where((id) => !used.contains(id)), isEmpty);
+  test('la libreria ha i 5 esercizi ai macchinari aggiunti, nel loro gruppo', () {
+    // La libreria è di tutti: ha anche esercizi che la scheda di prova non usa.
+    const added = {
+      'croci_cavi': MuscleGroup.petto,
+      'alzate_laterali_cavo': MuscleGroup.spalle,
+      'trazioni_assistite': MuscleGroup.schiena,
+      'squat_multipower': MuscleGroup.gambe,
+      'leg_curl_sdraiato': MuscleGroup.gambe,
+    };
+    expect(data.exercises, hasLength(46));
+    for (final MapEntry(key: id, value: group) in added.entries) {
+      expect(data.exercises[id]?.group, group, reason: id);
+      expect(data.exercises[id]?.hasWeight, isTrue, reason: id);
+    }
   });
 
   test('le illustrazioni dei muscoli esistono, solo sugli esercizi coi pesi', () {
     final withImage = data.exercises.values.where((e) => e.muscleAsset != null).toList();
-    // 20 dei 23 esercizi coi pesi: iperestensioni, adductor e calf non hanno
+    // 25 dei 28 esercizi coi pesi: iperestensioni, adductor e calf non hanno
     // ancora un'illustrazione (mancano lombari, adduttori e polpacci).
-    expect(withImage, hasLength(20));
+    expect(withImage, hasLength(25));
     for (final e in withImage) {
       expect(File(e.muscleAsset!).existsSync(), isTrue, reason: e.muscleAsset);
       expect(e.hasWeight, isTrue, reason: e.id);

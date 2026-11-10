@@ -29,6 +29,7 @@ COLORS = {
     "spalle": "#BF5AF2",
     "braccia": "#FF9F0A",
     "core": "#34C759",
+    "cardio": "#30B0C7",
     "riscaldamento": "#FF6B3D",
 }
 
@@ -59,7 +60,7 @@ def arc(cx, cy, r, start, end, steps=10):
 # equip: polilinee degli attrezzi; circles: (x, y, r) di attrezzi tondi.
 POSES = {
     # Riscaldamento
-    "cardio_riscaldamento": dict(group="riscaldamento", head=(61, 24),
+    "tapis_roulant": dict(group="cardio", head=(61, 24),
         body=["60,36 58,64", "58,64 66,82 70,99 78,99", "58,64 52,82 44,97", "60,38 66,50 74,56", "60,38 52,50 47,60"],
         equip=["24,104 96,104", "92,104 88,58 78,58"]),
     "dislocazioni_bastone": dict(group="riscaldamento", head=(60, 23),
@@ -196,6 +197,42 @@ POSES = {
     "calf_machine": dict(group="gambe", head=(60, 22),
         body=["60,34 60,64", "60,64 61,82 61,94 70,98", "60,38 70,46 72,34"],
         equip=["48,33 74,33", "80,26 80,103", "64,102 86,102"]),
+
+    # Cardio · Macchine (con il tapis roulant qui sopra)
+    # Di lato, seduto sul sellino, mani sul manubrio, volano davanti.
+    "cyclette": dict(group="cardio", head=(63, 22),
+        body=["46,56 58,32", "58,34 70,42 76,48", "46,56 66,62 62,86"],
+        equip=["38,58 54,58", "48,58 56,98", "28,100 98,100", "56,98 84,92", "80,90 76,48", "70,46 84,46"],
+        circles=[(84, 88, 9), (60, 86, 4)]),
+    # Di lato, sale i gradini tenendosi al corrimano.
+    "stair_climber": dict(group="cardio", head=(61, 20),
+        body=["54,58 58,30", "58,34 66,44 74,45", "54,58 50,76 46,90", "54,58 70,64 66,78"],
+        equip=["34,92 50,92 50,80 66,80 66,68 82,68 82,56 98,56", "98,24 98,104", "68,44 98,38"]),
+
+    # Pesi · Macchinari (aggiunti per la libreria pubblica)
+    # Pancia in giù sulla panca, talloni verso i glutei contro il rullo.
+    "leg_curl_sdraiato": dict(group="gambe", head=(22, 68),
+        body=["32,72 64,72", "64,72 86,74 95,52", "34,73 32,88"],
+        equip=["14,80 98,80", "24,80 24,103", "80,80 80,103"],
+        circles=[(90, 47, 5)]),
+    # Squat col bilanciere guidato: due binari e la sbarra sulle spalle.
+    "squat_multipower": dict(group="gambe", head=(58, 30),
+        body=["50,70 56,43", "50,70 72,72 66,100 78,100", "56,44 66,52 70,40"],
+        equip=["24,8 24,103", "96,8 96,103", "14,40 106,40"]),
+    # Di fronte, braccia aperte: i cavi scendono dalle carrucole alte alle mani.
+    "croci_cavi": dict(group="petto", head=(60, 24),
+        body=["60,36 60,64", *front_legs(), "60,40 46,48 36,60", "60,40 74,48 84,60"],
+        equip=["14,16 14,104", "106,16 106,104", "18,20 36,60", "102,20 84,60"],
+        circles=[(18, 20, 4.5), (102, 20, 4.5)]),
+    # Di fronte: il cavo parte dalla carrucola bassa e passa davanti al corpo.
+    "alzate_laterali_cavo": dict(group="spalle", head=(60, 23),
+        body=["60,35 60,62", *front_legs(), "60,38 77,40 92,37", "60,38 54,52 52,62"],
+        equip=["16,30 16,104", "20,98 92,37"],
+        circles=[(20, 98, 4.5)]),
+    # Di lato: in ginocchio sulla pedana, mani sulle maniglie in alto.
+    "trazioni_assistite": dict(group="schiena", head=(44, 33),
+        body=["50,44 54,74", "54,74 58,94 38,96", "50,46 58,30 60,14"],
+        equip=["36,12 88,12", "86,12 86,104", "32,102 86,102"]),
 
 }
 

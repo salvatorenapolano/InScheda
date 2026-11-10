@@ -33,6 +33,19 @@ void main() {
       expect(status, isA<WeighInUpcoming>().having((s) => s.date, 'date', nextFriday));
     });
 
+    test('col giorno della pesata di lunedì cambia tutto il calendario', () {
+      // Lunedì 2 novembre: pesata fatta. Venerdì 6: prossima lunedì 9.
+      final done = [entry(DateTime(2026, 11, 2), 78)];
+      expect(
+        weighInStatusFor(done, friday, weekday: DateTime.monday),
+        isA<WeighInUpcoming>().having((s) => s.date, 'date', DateTime(2026, 11, 9)),
+      );
+      // Lunedì 9 senza pesata: oggi ti devi pesare.
+      expect(weighInStatusFor(done, DateTime(2026, 11, 9), weekday: DateTime.monday), isA<WeighInDueToday>());
+      // Martedì 10, lunedì saltato: pesata da fare.
+      expect(weighInStatusFor(done, DateTime(2026, 11, 10), weekday: DateTime.monday), isA<WeighInMissed>());
+    });
+
     test('nessuna pesata e non è venerdì: si parte dal prossimo venerdì', () {
       final status = weighInStatusFor([], thursday);
       expect(status, isA<WeighInUpcoming>().having((s) => s.date, 'date', DateTime(2026, 11, 6)));

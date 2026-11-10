@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import 'package:my_workout/data/optional_asset.dart';
 import 'package:my_workout/models/shopping.dart';
 
 /// Legge shopping.json dagli asset. Stessa idea di DietRepository.
@@ -12,7 +13,11 @@ class ShoppingRepository {
 
   static const _path = 'assets/data/shopping.json';
 
-  Future<List<ShoppingList>> load() async => parse(await _bundle.loadString(_path));
+  /// null = l'utente non ha (ancora) una lista della spesa.
+  Future<List<ShoppingList>?> load() async {
+    final json = await _bundle.loadStringOrNull(_path);
+    return json == null ? null : parse(json);
+  }
 
   static List<ShoppingList> parse(String json) {
     final data = jsonDecode(json) as Map<String, dynamic>;
