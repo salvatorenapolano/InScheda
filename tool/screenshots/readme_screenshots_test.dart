@@ -110,7 +110,7 @@ Future<void> _precacheImages(WidgetTester tester) async {
   await _settle(tester);
 }
 
-/// Salva la schermata in docs/screenshots/<name>.png.
+/// Salva la schermata in `docs/screenshots/<name>.png`.
 ///
 /// Nei test le ombre sono spente e al loro posto c'è un bordo nero
 /// (debugDisableShadows): le accendiamo solo mentre disegniamo e poi le
@@ -141,6 +141,9 @@ Future<void> _shot(WidgetTester tester, String name) async {
 Future<MyWorkoutApp> _app({required bool onboardingDone}) async {
   final today = DateTime.now();
   String day(int daysAgo) => today.subtract(Duration(days: daysAgo)).toIso8601String().substring(0, 10);
+  // È uno strumento "da test" che gira fuori da test/: l'analizzatore lo
+  // segnala, ma qui è proprio quello che vogliamo.
+  // ignore: invalid_use_of_visible_for_testing_member
   SharedPreferences.setMockInitialValues({
     'onboarding_done': onboardingDone,
     'profile_name': 'Mario Rossi',
