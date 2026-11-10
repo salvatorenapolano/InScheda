@@ -2,7 +2,7 @@
 
 App Flutter per la palestra: scheda di allenamento, dieta settimanale e pesata settimanale, tutto in un'unica app, senza account e senza server.
 
-> **Stato:** in sviluppo, verso la prima versione di prova (0.1.0). L'app è usabile: al primo avvio crei la tua scheda, poi aggiungi dieta e pesate. Manca ancora l'editor della lista della spesa.
+> **Stato:** in sviluppo; la prima versione di prova (0.1.0) è nelle [Releases](../../releases). L'app è usabile: al primo avvio crei la tua scheda, poi aggiungi dieta e pesate. Manca ancora l'editor della lista della spesa.
 
 <table>
   <tr>
@@ -29,7 +29,7 @@ Scheda, dieta e giorno della pesata si cambiano quando vuoi dal cerchio del prof
 
 ## Installazione
 
-- **Android**: a breve l'APK nella pagina [Releases](../../releases) (per installarlo serve consentire l'installazione da "origini sconosciute").
+- **Android 7.0 o più recente**: scarica dalla pagina [Releases](../../releases) il file **`-arm64.apk`** (va bene per quasi tutti i telefoni; `-arm32.apk` solo per telefoni molto vecchi) e aprilo. Android chiederà di consentire l'installazione da quella fonte.
 - Google Play: in arrivo.
 - **iOS**: l'app non è sull'App Store. La cartella `ios/` c'è, quindi chi ha un Mac (o un servizio di build nel cloud) può compilarla per il proprio iPhone.
 

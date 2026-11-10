@@ -1,8 +1,9 @@
 # Ricetta di compilazione per Codemagic (un computer nel cloud).
 #
-# Produce l'APK Android (da installare o da mettere nelle Releases di
+# Produce gli APK Android (da installare o da mettere nelle Releases di
 # GitHub). Le build Android si possono fare anche sul PC con
-# `flutter build apk --release`: questa serve per averle uguali ogni volta.
+# `flutter build apk --release --split-per-abi`: questa serve per averle
+# uguali ogni volta.
 # Su Codemagic: Start new build → workflow "Android".
 #
 # ATTENZIONE: per ora l'APK è firmato con la chiave di debug (vedi
@@ -30,8 +31,11 @@ workflows:
       - name: Esegui i test
         script: flutter test
 
-      - name: Compila l'APK
-        script: flutter build apk --release
+      # Un APK per tipo di processore: ~20 MB l'uno invece di ~60 MB.
+      # arm64 va su quasi tutti i telefoni, armeabi-v7a sui vecchi a 32 bit.
+      - name: Compila gli APK
+        script: flutter build apk --release --split-per-abi
 
     artifacts:
-      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+      - build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
