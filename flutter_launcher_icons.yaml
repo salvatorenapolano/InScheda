@@ -1,0 +1,24 @@
+# Configurazione dell'icona dell'app.
+# Per rigenerarla:  python tool/generate_app_icon.py
+#                   dart run flutter_launcher_icons
+# Attenzione: la versione 0.14 modifica per errore ios/Runner.xcodeproj/
+# project.pbxproj (ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS
+# diventa "AppIcon"): dopo averla lanciata, annulla quella modifica con
+#                   git checkout -- ios/Runner.xcodeproj/project.pbxproj
+flutter_launcher_icons:
+  image_path: "assets/icon/app_icon.png"
+
+  # iPhone: l'App Store non accetta icone con trasparenza.
+  ios: true
+  remove_alpha_ios: true
+  # iOS 18+: varianti per la modalità scura (manubrio su trasparente,
+  # lo sfondo lo mette il sistema) e "colorata" (in scala di grigi).
+  image_path_ios_dark_transparent: "assets/icon/app_icon_dark.png"
+  image_path_ios_tinted_grayscale: "assets/icon/app_icon_tinted.png"
+
+  # Android: icona "classica" + icona adattiva (sfondo e primo piano
+  # separati, che il telefono ritaglia nella forma che preferisce).
+  android: true
+  min_sdk_android: 21
+  adaptive_icon_background: "assets/icon/app_icon_background.png"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"

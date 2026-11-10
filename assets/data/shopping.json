@@ -1,0 +1,93 @@
+{
+  "lists": [
+    {
+      "id": "settimanale",
+      "name": "Settimanale",
+      "sections": [
+        {
+          "name": "Proteine e latticini",
+          "items": [
+            { "id": "pollo_tacchino", "name": "Petto di pollo o tacchino", "quantity": "~500 g (di cui 180 g a fette sottili per la cotoletta)" },
+            { "id": "manzo_magro", "name": "Macinato o hamburger di manzo magro", "quantity": "~250 g" },
+            { "id": "uova", "name": "Uova", "quantity": "6" },
+            { "id": "latte", "name": "Latte parzialmente scremato", "quantity": "2 L" },
+            { "id": "yogurt_greco", "name": "Yogurt greco bianco 0–2%", "quantity": "6 vasetti da 170 g (o 1 kg)" },
+            { "id": "fiocchi_latte", "name": "Fiocchi di latte", "quantity": "4 confezioni da 150 g" },
+            { "id": "salmone_fresco", "name": "Salmone fresco", "quantity": "150 g (oppure dalla scorta surgelata)" }
+          ]
+        },
+        {
+          "name": "Pane e patate",
+          "items": [
+            { "id": "pane_integrale", "name": "Pane integrale", "quantity": "~300 g: affettalo e congelalo a porzioni da 60 g" },
+            { "id": "patate", "name": "Patate", "quantity": "1 kg" }
+          ]
+        },
+        {
+          "name": "Frutta",
+          "items": [
+            { "id": "mele", "name": "Mele", "quantity": "5" },
+            { "id": "pere", "name": "Pere", "quantity": "3" },
+            { "id": "kiwi", "name": "Kiwi", "quantity": "4" },
+            { "id": "banane", "name": "Banane", "quantity": "4 (per i post-workout)" },
+            { "id": "frutto_stagione", "name": "1 frutto di stagione a scelta: cachi, uva, melograno", "quantity": "per variare" }
+          ]
+        },
+        {
+          "name": "Verdure · circa 3 kg",
+          "items": [
+            { "id": "zucchine", "name": "Zucchine", "quantity": "600 g" },
+            { "id": "broccoli", "name": "Broccoli, friarielli o cavolfiore", "quantity": "500 g" },
+            { "id": "insalata_rucola", "name": "Insalata o rucola", "quantity": "2 buste" },
+            { "id": "finocchi", "name": "Finocchi", "quantity": "2" },
+            { "id": "pomodorini", "name": "Pomodorini", "quantity": "500 g" },
+            { "id": "carote", "name": "Carote", "quantity": "500 g (anche da sgranocchiare contro la fame)" },
+            { "id": "fagiolini", "name": "Fagiolini", "quantity": "300 g (anche surgelati)" },
+            { "id": "zucca", "name": "Zucca", "quantity": "1 spicchio (~400 g)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mensile",
+      "name": "Mensile",
+      "sections": [
+        {
+          "name": "Dispensa",
+          "items": [
+            { "id": "whey", "name": "Whey con creatina", "quantity": "~1,3 kg (circa 10 misurini a settimana)" },
+            { "id": "pasta", "name": "Pasta (metà integrale)", "quantity": "2 kg" },
+            { "id": "riso", "name": "Riso", "quantity": "500 g (scorta per gli scambi)" },
+            { "id": "avena", "name": "Fiocchi d'avena", "quantity": "500 g" },
+            { "id": "biscotti", "name": "Biscotti secchi o fette biscottate integrali", "quantity": "~1,2 kg" },
+            { "id": "legumi_scatola", "name": "Legumi in scatola: lenticchie, ceci, fagioli", "quantity": "8 barattoli (o 500 g di lenticchie rosse secche)" },
+            { "id": "tonno", "name": "Tonno al naturale", "quantity": "16 scatolette da 80 g" },
+            { "id": "passata", "name": "Passata di pomodoro", "quantity": "4 bottiglie" },
+            { "id": "parmigiano", "name": "Parmigiano o grana", "quantity": "200 g" },
+            { "id": "frutta_secca", "name": "Frutta secca mista al naturale", "quantity": "400–500 g" },
+            { "id": "albumi", "name": "Albumi in brick", "quantity": "500 g" },
+            { "id": "pangrattato", "name": "Pangrattato", "quantity": "1 confezione" },
+            { "id": "olio_evo", "name": "Olio EVO", "quantity": "1 L (la tua parte) + 1 olio spray" },
+            { "id": "marmellata", "name": "Marmellata (facoltativa)", "quantity": "1 vasetto" }
+          ]
+        },
+        {
+          "name": "Surgelati",
+          "items": [
+            { "id": "salmone_surgelato", "name": "Filetti di salmone", "quantity": "4 porzioni da 150 g" },
+            { "id": "verdure_surgelate", "name": "Verdure grigliate o miste", "quantity": "3 buste" },
+            { "id": "spinaci_fagiolini", "name": "Spinaci o fagiolini", "quantity": "2 buste" },
+            { "id": "frutti_bosco", "name": "Frutti di bosco", "quantity": "2 buste" }
+          ]
+        },
+        {
+          "name": "Varie",
+          "items": [
+            { "id": "spezie", "name": "Spezie: origano, rosmarino, paprika, pepe, cannella, aglio in polvere" },
+            { "id": "tisane_gomme", "name": "Tisane e gomme senza zucchero" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "name": "La settimana tipo",
+  "version": "v2",
+
+  "slots": [
+    { "id": "pranzo", "name": "Pranzo", "time": "13:00", "emoji": "☀️" },
+    { "id": "cena", "name": "Cena", "time": "20:00", "emoji": "🌙" },
+    { "id": "giornata", "name": "Pranzo e cena", "emoji": "☀️🌙" }
+  ],
+
+  "categories": ["Frutta e verdura", "Carne e pesce", "Frigo", "Pane", "Dispensa"],
+
+  "foods": [
+    { "id": "pasta", "name": "Pasta", "category": "Dispensa" },
+    { "id": "tonno", "name": "Tonno al naturale", "category": "Dispensa" },
+    { "id": "passata", "name": "Passata di pomodoro", "category": "Dispensa" },
+    { "id": "legumi", "name": "Legumi cotti", "category": "Dispensa" },
+    { "id": "olio", "name": "Olio extravergine d'oliva", "category": "Dispensa" },
+    { "id": "parmigiano", "name": "Parmigiano", "category": "Frigo" },
+    { "id": "prosciutto_cotto", "name": "Prosciutto cotto", "category": "Frigo" },
+    { "id": "pesto", "name": "Pesto alla genovese", "category": "Frigo" },
+    { "id": "petto_pollo", "name": "Petto di pollo", "category": "Carne e pesce" },
+    { "id": "salmone", "name": "Salmone", "category": "Carne e pesce" },
+    { "id": "hamburger_manzo", "name": "Hamburger di manzo magro", "category": "Carne e pesce" },
+    { "id": "cotoletta", "name": "Pollo o tacchino impanato", "category": "Carne e pesce" },
+    { "id": "patate", "name": "Patate", "category": "Frutta e verdura" },
+    { "id": "verdure", "name": "Verdure", "category": "Frutta e verdura" },
+    { "id": "zucchine", "name": "Zucchine", "category": "Frutta e verdura" },
+    { "id": "insalata", "name": "Insalata", "category": "Frutta e verdura" },
+    { "id": "fagiolini", "name": "Fagiolini", "category": "Frutta e verdura" },
+    { "id": "pomodorini", "name": "Pomodorini", "category": "Frutta e verdura" },
+    { "id": "pane_integrale", "name": "Pane integrale", "category": "Pane" },
+    { "id": "pane", "name": "Pane", "category": "Pane" }
+  ],
+
+  "days": [
+    {
+      "name": "Lunedì",
+      "training": true,
+      "meals": [
+        {
+          "slot": "pranzo",
+          "title": "Pasta al pomodoro e tonno",
+          "items": [
+            { "foodId": "pasta", "quantity": 90, "unit": "g" },
+            { "foodId": "tonno", "quantity": 80, "unit": "g", "note": "sgocciolato" },
+            { "foodId": "passata" },
+            { "foodId": "parmigiano", "quantity": 10, "unit": "g" },
+            { "foodId": "olio", "quantity": 10, "unit": "g" }
+          ]
+        },
+        {
+          "slot": "cena",
+          "title": "Pollo e patate",
+          "items": [
+            { "foodId": "petto_pollo", "quantity": 180, "unit": "g" },
+            { "foodId": "patate", "quantity": 250, "unit": "g", "note": "in friggitrice" },
+            { "foodId": "olio", "quantity": 15, "unit": "g" }
+          ],
+          "alternative": "Se mancano le patate: 250–300 g di verdure."
+        }
+      ]
+    },
+    {
+      "name": "Martedì",
+      "training": false,
+      "meals": [
+        {
+          "slot": "pranzo",
+          "title": "Pasta e legumi",
+          "items": [
+            { "foodId": "pasta", "quantity": 60, "unit": "g" },
+            { "foodId": "legumi", "quantity": 150, "unit": "g", "note": "a scelta, vedi sotto" },
+            { "foodId": "parmigiano", "quantity": 15, "unit": "g" },
+            { "foodId": "olio", "quantity": 10, "unit": "g" }
+          ]
+        },
+        {
+          "slot": "cena",
+          "title": "Salmone",
+          "items": [
+            { "foodId": "salmone", "quantity": 150, "unit": "g", "note": "in friggitrice" },
+            { "foodId": "verdure", "quantity": 250, "quantityMax": 300, "unit": "g" },
+            { "foodId": "pane_integrale", "quantity": 60, "unit": "g" },
+            { "foodId": "olio", "quantity": 15, "unit": "g" }
+          ],
+          "alternative": "Se manca il salmone: frittata con 3 uova + 100 g albumi."
+        }
+      ]
+    },
+    {
+      "name": "Mercoledì",
+      "training": true,
+      "meals": [
+        {
+          "slot": "pranzo",
+          "title": "Pasta zucchine e prosciutto cotto",
+          "items": [
+            { "foodId": "pasta", "quantity": 90, "unit": "g" },
+            { "foodId": "zucchine", "quantity": 200, "unit": "g" },
+            { "foodId": "prosciutto_cotto", "quantity": 60, "unit": "g", "note": "a dadini" },
+            { "foodId": "parmigiano", "quantity": 10, "unit": "g" },
+            { "foodId": "olio", "quantity": 10, "unit": "g" }
+          ]
+        },
+        {
+          "slot": "cena",
+          "title": "Hamburger e patate",
+          "items": [
+            { "foodId": "hamburger_manzo", "quantity": 150, "unit": "g" },
+            { "foodId": "patate", "quantity": 250, "unit": "g" },
+            { "foodId": "olio", "quantity": 15, "unit": "g" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Giovedì",
+      "training": false,
+      "meals": [
+        {
+          "slot": "pranzo",
+          "title": "Pasta e ceci o fagioli",
+          "items": [
+            { "foodId": "pasta", "quantity": 60, "unit": "g" },
+            { "foodId": "legumi", "quantity": 150, "unit": "g", "note": "ceci o fagioli" },
+            { "foodId": "parmigiano", "quantity": 15, "unit": "g" },
+            { "foodId": "olio", "quantity": 10, "unit": "g" }
+          ]
+        },
+        {
+          "slot": "cena",
+          "title": "Cotoletta in friggitrice",
+          "items": [
+            { "foodId": "cotoletta", "quantity": 180, "unit": "g" },
+            { "foodId": "verdure", "note": "grigliate" },
+            { "foodId": "pane_integrale", "quantity": 60, "unit": "g" },
+            { "foodId": "olio", "quantity": 15, "unit": "g" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Venerdì",
+      "training": true,
+      "meals": [
+        {
+          "slot": "pranzo",
+          "title": "Pasta al pesto verde con pollo",
+          "items": [
+            { "foodId": "pasta", "quantity": 90, "unit": "g" },
+            { "foodId": "pesto", "quantity": 15, "unit": "g", "note": "1 cucchiaio, al posto dell'olio" },
+            { "foodId": "petto_pollo", "quantity": 100, "unit": "g", "note": "a cubetti" }
+          ]
+        },
+        {
+          "slot": "cena",
+          "title": "Insalatona di tonno",
+          "items": [
+            { "foodId": "tonno", "quantity": 150, "unit": "g", "note": "sgocciolato" },
+            { "foodId": "fagiolini" },
+            { "foodId": "pomodorini" },
+            { "foodId": "patate", "quantity": 250, "unit": "g", "note": "lesse" },
+            { "foodId": "olio", "quantity": 15, "unit": "g" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sabato",
+      "training": false,
+      "meals": [
+        {
+          "slot": "pranzo",
+          "title": "Insalatona con pollo",
+          "items": [
+            { "foodId": "petto_pollo", "quantity": 120, "unit": "g" },
+            { "foodId": "verdure", "note": "miste" },
+            { "foodId": "pane", "quantity": 50, "unit": "g" },
+            { "foodId": "olio", "quantity": 10, "unit": "g" }
+          ]
+        },
+        {
+          "slot": "cena",
+          "title": "Pizza",
+          "description": "Margherita, verdure o prosciutto · niente fritti prima · acqua o bibita zero."
+        }
+      ]
+    },
+    {
+      "name": "Domenica",
+      "training": false,
+      "meals": [
+        {
+          "slot": "giornata",
+          "title": "Libera, senza esagerare",
+          "rules": [
+            "Un piatto per portata, niente bis.",
+            "Massimo 2 portate, dolce solo in porzione piccola.",
+            "Se il pranzo è abbondante, cena leggera: proteina + verdure, senza pane."
+          ]
+        }
+      ]
+    }
+  ],
+
+  "legumes": {
+    "title": "I legumi a scelta",
+    "description": "Sempre 150 g cotti (in scatola: sgocciolati e sciacquati) oppure 50 g secchi. Per variare, scegline uno diverso da quello di giovedì.",
+    "options": ["Lenticchie", "Ceci", "Fagioli borlotti o cannellini", "Piselli (anche surgelati)", "Fave", "Cicerchie", "Mix per zuppa"]
+  },
+
+  "notes": [
+    "Pasta: pesata a crudo.",
+    "Olio EVO: 10 g a pranzo (1 cucchiaio), 15 g a cena (1 cucchiaio e mezzo), sempre misurato.",
+    "Verdure: mangiale per prime.",
+    "Chi cucina: la tua porzione di carne o pesce con poco olio, il tuo lo aggiungi tu a crudo."
+  ]
+}

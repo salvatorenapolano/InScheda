@@ -1,0 +1,266 @@
+{
+  "name": "Fase 2 · Push/Pull/Legs",
+  "version": "v1",
+  "startDate": "2026-11-16",
+  "endDate": "2026-12-23",
+  "schedule": {
+    "weekdays": [1, 3, 5],
+    "time": "15:00",
+    "rotation": ["push", "pull", "legs"]
+  },
+  "generalNotes": "Doppia progressione: resta dentro l'intervallo di ripetizioni (le ultime 2 faticose, con 1–2 di riserva). Quando fai tutte le serie al numero massimo con buona tecnica, la volta dopo aumenti il peso e riparti dal numero minimo. Macchinari nuovi: nella settimana 1 fai prima una serie leggera da 10 per regolare la macchina, non conta nelle serie.",
+
+  "workouts": [
+    {
+      "id": "push",
+      "name": "Push",
+      "focus": "Petto, spalle, tricipiti",
+      "intro": "19–21 serie. Prima i muscoli grandi, poi i piccoli.",
+      "warmup": {
+        "title": "Riscaldamento",
+        "durationMinutes": 10,
+        "exercises": [
+          { "exerciseId": "cardio_riscaldamento", "reps": "5 minuti" },
+          { "exerciseId": "dislocazioni_bastone", "reps": "10" },
+          {
+            "exerciseId": "rotazioni_braccia",
+            "reps": "10 avanti + 10 indietro"
+          },
+          { "exerciseId": "rotazioni_busto", "reps": "10 per lato" },
+          { "exerciseId": "piegamenti_rialzo", "reps": "10" },
+          { "exerciseId": "gatto_cammello", "reps": "10" }
+        ]
+      },
+      "exercises": [
+        {
+          "exerciseId": "chest_press",
+          "sets": 4,
+          "reps": "8–12",
+          "restSeconds": 120,
+          "alternatives": ["Panca piana con manubri"]
+        },
+        {
+          "exerciseId": "pec_deck",
+          "sets": 3,
+          "reps": "12–15",
+          "restSeconds": 90,
+          "notes": "Settimana 1: prima una serie leggera da 10 per regolare la macchina (non conta)."
+        },
+        {
+          "exerciseId": "shoulder_press_macchina",
+          "sets": 3,
+          "reps": "10–12",
+          "restSeconds": 90,
+          "alternatives": ["Lento con manubri da seduto"]
+        },
+        {
+          "exerciseId": "alzate_laterali_manubri",
+          "sets": 3,
+          "reps": "12–15",
+          "restSeconds": 60,
+          "alternatives": ["Alzate al cavo", "Macchina deltoidi"]
+        },
+        {
+          "exerciseId": "pushdown_cavo",
+          "sets": 3,
+          "reps": "12–15",
+          "restSeconds": 60
+        },
+        {
+          "exerciseId": "macchina_tricipiti",
+          "sets": 3,
+          "reps": "10–12",
+          "restSeconds": 60
+        },
+        {
+          "exerciseId": "french_press_manubrio",
+          "sets": 2,
+          "reps": "12",
+          "restSeconds": 60,
+          "notes": "Solo nelle settimane 1, 3 e 5."
+        }
+      ]
+    },
+    {
+      "id": "pull",
+      "name": "Pull",
+      "focus": "Dorso, deltoidi posteriori, lombari, bicipiti",
+      "intro": "20 serie. Prima la schiena, poi le braccia.",
+      "warmup": {
+        "title": "Riscaldamento",
+        "durationMinutes": 10,
+        "exercises": [
+          { "exerciseId": "cardio_riscaldamento", "reps": "5 minuti" },
+          { "exerciseId": "dislocazioni_bastone", "reps": "10" },
+          { "exerciseId": "rotazioni_busto", "reps": "10 per lato" },
+          { "exerciseId": "gatto_cammello", "reps": "10" },
+          { "exerciseId": "good_morning_bastone", "reps": "10" },
+          { "exerciseId": "tirate_scapolari", "reps": "12" }
+        ]
+      },
+      "exercises": [
+        {
+          "exerciseId": "lat_machine",
+          "sets": 4,
+          "reps": "8–12",
+          "restSeconds": 120,
+          "alternatives": ["Pulldown al cavo", "Trazioni assistite"]
+        },
+        {
+          "exerciseId": "pulley_basso",
+          "sets": 3,
+          "reps": "10–12",
+          "restSeconds": 90,
+          "alternatives": ["Rematore con manubrio"]
+        },
+        {
+          "exerciseId": "rematore_appoggio_petto",
+          "sets": 3,
+          "reps": "10–12",
+          "restSeconds": 90
+        },
+        {
+          "exerciseId": "reverse_pec_deck",
+          "sets": 3,
+          "reps": "12–15",
+          "restSeconds": 60,
+          "notes": "Settimana 1: prima una serie leggera da 10 per regolare la macchina (non conta)."
+        },
+        {
+          "exerciseId": "iperestensioni",
+          "sets": 2,
+          "reps": "12",
+          "restSeconds": 60,
+          "notes": "Settimana 1: prima una serie leggera da 10 per imparare il movimento (non conta)."
+        },
+        {
+          "exerciseId": "curl_macchina",
+          "sets": 3,
+          "reps": "10–12",
+          "restSeconds": 60,
+          "alternatives": ["Curl al cavo basso"]
+        },
+        {
+          "exerciseId": "curl_manubri",
+          "sets": 2,
+          "reps": "12",
+          "restSeconds": 60,
+          "alternatives": ["Curl al cavo basso"]
+        }
+      ]
+    },
+    {
+      "id": "legs",
+      "name": "Legs",
+      "focus": "Quadricipiti, glutei, femorali, interno ed esterno coscia, polpacci",
+      "intro": "23 serie, è la seduta più pesante: se il tempo stringe, la camminata finale scende a 10'.",
+      "warmup": {
+        "title": "Riscaldamento",
+        "durationMinutes": 10,
+        "exercises": [
+          { "exerciseId": "cardio_riscaldamento", "reps": "5 minuti" },
+          { "exerciseId": "squat_lento", "reps": "10" },
+          { "exerciseId": "ponte_glutei", "reps": "12" },
+          { "exerciseId": "good_morning_bastone", "reps": "10" },
+          { "exerciseId": "slanci_gamba", "reps": "10 per lato" },
+          { "exerciseId": "inclinazioni_laterali", "reps": "8 per lato" }
+        ]
+      },
+      "exercises": [
+        {
+          "exerciseId": "leg_press",
+          "sets": 4,
+          "reps": "10–12",
+          "restSeconds": 120
+        },
+        {
+          "exerciseId": "hack_squat",
+          "sets": 3,
+          "reps": "10",
+          "restSeconds": 120,
+          "notes": "Settimane 1–2 con la sola macchina o quasi.",
+          "alternatives": ["Squat al multipower"]
+        },
+        {
+          "exerciseId": "hip_thrust_macchina",
+          "sets": 3,
+          "reps": "10–12",
+          "restSeconds": 90,
+          "notes": "Settimana 1 leggero, per imparare."
+        },
+        {
+          "exerciseId": "leg_curl_seduto",
+          "sets": 3,
+          "reps": "12–15",
+          "restSeconds": 90,
+          "alternatives": ["Leg curl sdraiato"]
+        },
+        {
+          "exerciseId": "leg_extension",
+          "sets": 3,
+          "reps": "12–15",
+          "restSeconds": 60,
+          "alternatives": ["Affondi indietro con manubri leggeri"]
+        },
+        {
+          "exerciseId": "adductor",
+          "sets": 2,
+          "reps": "15",
+          "restSeconds": 60,
+          "notes": "Settimana 1: prima una serie leggera da 10 per regolare la macchina (non conta)."
+        },
+        {
+          "exerciseId": "abductor",
+          "sets": 2,
+          "reps": "15",
+          "restSeconds": 60,
+          "notes": "Settimana 1: prima una serie leggera da 10 per regolare la macchina (non conta)."
+        },
+        {
+          "exerciseId": "calf_machine",
+          "sets": 3,
+          "reps": "15",
+          "restSeconds": 60,
+          "notes": "Settimana 1: prima una serie leggera da 10 per regolare la macchina (non conta)."
+        }
+      ]
+    }
+  ],
+
+  "abs": {
+    "title": "Addominali",
+    "durationMinutes": 10,
+    "intro": "Tutti e tre i giorni: prima il crunch alla macchina, poi il tuo circuito.",
+    "exercises": [
+      {
+        "exerciseId": "crunch_macchina",
+        "sets": 3,
+        "reps": "12–15",
+        "restSeconds": 60,
+        "alternatives": ["Crunch inverso sul tappetino"]
+      },
+      {
+        "exerciseId": "plank",
+        "sets": 3,
+        "reps": "30\"",
+        "restSeconds": 45,
+        "notes": "Ogni settimana +5\".",
+        "alternatives": ["Plank sulle ginocchia"]
+      },
+      {
+        "exerciseId": "plank_laterale",
+        "reps": "20\" per lato",
+        "notes": "Con le ginocchia a terra se serve."
+      },
+      { "exerciseId": "leg_raise", "reps": "10–12" },
+      { "exerciseId": "heel_touch", "reps": "12 per lato" }
+    ]
+  },
+
+  "cardio": {
+    "title": "Cardio",
+    "durationMinutes": 30,
+    "inclinePercent": 10,
+    "speedKmh": 5.5
+  }
+}
