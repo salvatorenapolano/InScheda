@@ -160,7 +160,8 @@ Nella versione pubblica **non c'è nessun download**: tolti il pulsante "Scarica
 ## Build e distribuzione
 
 - **Android** (l'unica piattaforma distribuita): `flutter build apk --release` sul PC, oppure Codemagic col workflow "Android" di `codemagic.yaml` (analyze, test, APK). Prima l'APK nelle **Releases di GitHub**, poi **Google Play** (25 $ una tantum, test chiuso con almeno 12 tester per 14 giorni).
-- La release è ancora firmata con la **chiave di debug**: prima del Play Store servono una upload key (fuori dal repo, `key.properties` e `*.jks` sono già in `.gitignore`) e la build `flutter build appbundle`.
+- **Firma di release**: upload key in `C:\Users\salva\keys\myworkout-upload.jks` (alias `upload`, fuori dal repo, con backup), letta da `android/key.properties` (ignorato da git). Senza `key.properties` (Codemagic, altri PC) `build.gradle.kts` firma con la chiave di debug. Verifica: `apksigner verify --print-certs` deve dire `CN=myWorkout, O=salvatorenapolano`.
+- **Versioni**: `version` in `pubspec.yaml` (nome+build). 0.1.0+1 = prima Release su GitHub (tag `v0.1.0`, 10/11/2026, APK universale ~58 MB, `myWorkout-0.1.0.apk`). Il numero dopo il `+` deve crescere a ogni APK/AAB pubblicato. Per il Play Store servirà `flutter build appbundle`.
 - **iOS**: la cartella `ios/` resta (icone, bundle id, Info.plist) così chi ha un Mac può compilarla per sé, ma l'app **non va sull'App Store** (niente Apple Developer Program). La mia installazione personale con Sideloadly è descritta nel repo privato.
 
 ## Figma
