@@ -1,21 +1,35 @@
 # myWorkout
 
-App Flutter per la palestra: scheda di allenamento, dieta settimanale, pesata settimanale e lista della spesa, tutto in un'unica app, senza account e senza server.
+App Flutter per la palestra: scheda di allenamento, dieta settimanale e pesata settimanale, tutto in un'unica app, senza account e senza server.
 
-> **Stato:** in sviluppo. Al momento l'app contiene una scheda e una dieta di esempio; il prossimo passo è permettere a ogni utente di inserire i propri dati al primo avvio.
+> **Stato:** in sviluppo, verso la prima versione di prova (0.1.0). L'app è usabile: al primo avvio crei la tua scheda, poi aggiungi dieta e pesate. Manca ancora l'editor della lista della spesa.
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/1_benvenuto.png" width="240" alt="Benvenuto"><br><sub>Primo avvio</sub></td>
+    <td align="center"><img src="docs/screenshots/2_allenamento.png" width="240" alt="Allenamento"><br><sub>L'allenamento di oggi</sub></td>
+    <td align="center"><img src="docs/screenshots/3_esercizio.png" width="240" alt="Dettaglio esercizio"><br><sub>Esercizio, peso e muscoli</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/4_libreria.png" width="240" alt="Libreria esercizi"><br><sub>Libreria per gruppo muscolare</sub></td>
+    <td align="center"><img src="docs/screenshots/5_dieta.png" width="240" alt="Dieta"><br><sub>La dieta della settimana</sub></td>
+    <td align="center"><img src="docs/screenshots/6_pesata.png" width="240" alt="Pesata"><br><sub>Pesata settimanale</sub></td>
+  </tr>
+</table>
 
 ## Cosa fa
 
-- **Allenamento** — le tue schede (A/B/C, Push/Pull/Legs o i nomi che vuoi) con il giorno di turno. Ogni esercizio ha video, istruzioni, consigli, i muscoli coinvolti e il peso che usi (salvato sul telefono).
-- **Dieta** — la settimana dei pasti, giorno per giorno: la scrivi tu nell'app (pasti, alimenti e quantità).
+- **Allenamento** — le tue schede (A/B/C, Push/Pull/Legs o i nomi che vuoi) che si alternano nei giorni scelti, con il giorno di turno sempre in cima. Ogni esercizio ha istruzioni, consigli, i muscoli coinvolti, spesso un video, e il peso che usi (salvato sul telefono).
+- **Libreria** — 46 esercizi divisi per gruppo muscolare (pesi, macchinari, addominali, cardio, riscaldamento), con ricerca. Se manca qualcosa, crei un esercizio tuo. Ogni esercizio si misura nel modo giusto: serie × ripetizioni, a tempo (il plank) o in minuti con velocità, pendenza o livello (tapis roulant, cyclette, stair climber).
+- **Dieta** — la settimana dei pasti, giorno per giorno: la scrivi tu nell'app (pasti, alimenti e quantità), con "uguale tutti i giorni" e "copia il giorno".
 - **Pesata** — promemoria nel giorno che scegli e storico delle pesate con le differenze.
-- **Spesa** — liste settimanale e mensile con le spunte.
+- **Spesa** — in arrivo: per ora la tab è vuota.
 
-Al primo avvio l'app ti chiede il nome e ti fa creare la tua scheda: giorni, schede con il nome che vuoi ed esercizi scelti dalla libreria, divisa per gruppo muscolare. Tutti i tuoi dati (scheda, dieta, pesi, pesate, spunte) restano **solo sul telefono**.
+Scheda, dieta e giorno della pesata si cambiano quando vuoi dal cerchio del profilo. Tutti i tuoi dati restano **solo sul telefono**.
 
 ## Installazione
 
-- **Android**: scarica l'APK dalla pagina [Releases](../../releases) e installalo (serve consentire l'installazione da "origini sconosciute").
+- **Android**: a breve l'APK nella pagina [Releases](../../releases) (per installarlo serve consentire l'installazione da "origini sconosciute").
 - Google Play: in arrivo.
 - **iOS**: l'app non è sull'App Store. La cartella `ios/` c'è, quindi chi ha un Mac (o un servizio di build nel cloud) può compilarla per il proprio iPhone.
 
@@ -35,16 +49,23 @@ flutter analyze
 flutter test
 ```
 
+Gli screenshot qui sopra li disegna l'app stessa, senza emulatore:
+
+```bash
+flutter test tool/screenshots/readme_screenshots_test.dart
+```
+
 ### Struttura
 
 ```
 lib/
 ├── data/       # lettura dei JSON e salvataggi sul telefono
 ├── models/     # esercizi, scheda, dieta, spesa, pesate
-├── features/   # una cartella per tab: workout, diet, weigh_in, shopping, profile
+├── features/   # una cartella per tab ed editor: workout, plan_editor, diet, diet_editor, onboarding…
 └── widgets/    # componenti condivisi
-assets/data/    # exercises.json, workout_plan.json, diet.json, shopping.json
-tool/           # script Python per anteprime, icona e immagini dei muscoli
+assets/data/    # exercises.json: la libreria degli esercizi
+test/fixtures/  # scheda, dieta e spesa di prova per i test
+tool/           # anteprime degli esercizi, icona, immagini dei muscoli, screenshot
 ```
 
 Più dettagli su dati e interfaccia in [docs/CONTESTO_PROGETTO.md](docs/CONTESTO_PROGETTO.md).
