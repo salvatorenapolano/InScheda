@@ -31,7 +31,8 @@ workflows:
       - name: Esegui i test
         script: flutter test
 
-      # Un APK per tipo di processore: ~20 MB l'uno invece di ~60 MB.
+      # Un APK per tipo di processore: ~10 MB l'uno (librerie native compresse,
+      # vedi build.gradle.kts) invece di ~60 MB dell'APK universale.
       # arm64 va su quasi tutti i telefoni, armeabi-v7a sui vecchi a 32 bit.
       - name: Compila gli APK
         script: flutter build apk --release --split-per-abi

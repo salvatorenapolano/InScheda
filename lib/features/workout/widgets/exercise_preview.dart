@@ -9,14 +9,61 @@ import 'package:my_workout/models/exercise.dart';
 /// Gli esercizi della libreria hanno il loro SVG (omino bianco su quadrato
 /// colorato). Quelli creati dall'utente no: per loro disegniamo lo stesso
 /// quadrato, col colore del gruppo, e l'iniziale del nome al posto dell'omino.
+///
+/// Con [number] sull'angolo in alto a sinistra compare il numero d'ordine
+/// dell'esercizio nella scheda (lo usano la tab Allenamento e l'editor).
 class ExercisePreview extends StatelessWidget {
-  const ExercisePreview({super.key, required this.exercise, this.size = 48});
+  const ExercisePreview({super.key, required this.exercise, this.size = 48, this.number});
 
   final Exercise exercise;
   final double size;
 
+  /// Il numero d'ordine (1, 2, 3...), o null per l'anteprima semplice.
+  final int? number;
+
   @override
   Widget build(BuildContext context) {
+    final preview = _preview();
+    final number = this.number;
+    if (number == null) return preview;
+
+    final colors = Theme.of(context).colorScheme;
+    // Il cerchietto cresce con l'anteprima: 22 punti su 48.
+    final badge = size * 22 / 48;
+    // Stack sovrappone i figli uno sull'altro (il primo sta sotto).
+    // clipBehavior: Clip.none lascia "sbordare" il cerchietto fuori
+    // dall'anteprima, invece di tagliarlo.
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        preview,
+        Positioned(
+          left: -badge * 0.27,
+          top: -badge * 0.27,
+          child: Container(
+            width: badge,
+            height: badge,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: colors.primary,
+              shape: BoxShape.circle,
+              // Il bordo del colore della card "stacca" il cerchio dall'immagine.
+              border: Border.all(color: Theme.of(context).cardTheme.color ?? colors.surface, width: 2),
+            ),
+            child: Text(
+              '$number',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: colors.onPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _preview() {
     // Semantics: il nome viene letto da TalkBack/VoiceOver al posto dell'immagine.
     return Semantics(
       label: 'Anteprima ${exercise.name}',

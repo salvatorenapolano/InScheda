@@ -12,12 +12,26 @@ import 'package:my_workout/utils/formatters.dart';
 ///   livello), niente serie né recupero.
 /// Restituisce il PlannedExercise aggiornato, o null se annulli.
 class PlannedExerciseDialog extends StatefulWidget {
-  const PlannedExerciseDialog({super.key, required this.planned, required this.exercise});
+  const PlannedExerciseDialog({
+    super.key,
+    required this.planned,
+    required this.exercise,
+    this.confirmLabel = 'Salva',
+    this.progress,
+  });
 
   final PlannedExercise planned;
 
   /// null se l'esercizio non è più in libreria: lo trattiamo a ripetizioni.
   final Exercise? exercise;
+
+  /// Il testo del pulsante di conferma: "Salva" quando modifichi,
+  /// "Aggiungi" quando l'esercizio sta per entrare nella scheda.
+  final String confirmLabel;
+
+  /// Una riga sopra al titolo quando si aggiungono più esercizi di fila:
+  /// "Esercizio 2 di 3". null = niente riga.
+  final String? progress;
 
   @override
   State<PlannedExerciseDialog> createState() => _PlannedExerciseDialogState();
@@ -85,7 +99,17 @@ class _PlannedExerciseDialogState extends State<PlannedExerciseDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.exercise?.name ?? planned.exerciseId),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.progress case final progress?)
+            Text(
+              progress,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
+            ),
+          Text(widget.exercise?.name ?? planned.exerciseId),
+        ],
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -99,7 +123,7 @@ class _PlannedExerciseDialogState extends State<PlannedExerciseDialog> {
       ),
       actions: [
         TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Annulla')),
-        FilledButton(onPressed: _save, child: const Text('Salva')),
+        FilledButton(onPressed: _save, child: Text(widget.confirmLabel)),
       ],
     );
   }

@@ -43,9 +43,7 @@ class PlannedExerciseTile extends StatelessWidget {
     final theme = Theme.of(context);
 
     return ListTile(
-      leading: number == null
-          ? ExercisePreview(exercise: exercise)
-          : _NumberedPreview(number: number, exercise: exercise),
+      leading: ExercisePreview(exercise: exercise, number: number),
       // Il nome nel font da tabellone, i dettagli nel font di sistema.
       title: Text(exercise.name, style: theme.textTheme.titleMedium),
       subtitle: Text(notes == null ? _details : '$_details\n$notes'),
@@ -79,51 +77,6 @@ class PlannedExerciseTile extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-/// L'anteprima con un cerchietto numerato sull'angolo in alto a sinistra.
-class _NumberedPreview extends StatelessWidget {
-  const _NumberedPreview({required this.number, required this.exercise});
-
-  final int number;
-  final Exercise exercise;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    // Stack sovrappone i figli uno sull'altro (il primo sta sotto).
-    // clipBehavior: Clip.none lascia "sbordare" il cerchietto fuori
-    // dall'anteprima, invece di tagliarlo.
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        ExercisePreview(exercise: exercise),
-        Positioned(
-          left: -6,
-          top: -6,
-          child: Container(
-            width: 22,
-            height: 22,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: colors.primary,
-              shape: BoxShape.circle,
-              // Il bordo del colore della card "stacca" il cerchio dall'immagine.
-              border: Border.all(color: Theme.of(context).cardTheme.color ?? colors.surface, width: 2),
-            ),
-            child: Text(
-              '$number',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: colors.onPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

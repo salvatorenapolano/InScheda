@@ -109,6 +109,14 @@ class PlanDraft extends ChangeNotifier {
   /// Aggiunge in fondo gli esercizi scelti, con valori di partenza adatti a
   /// come si misurano (vedi [defaultsFor]). [library] serve a saperlo: senza,
   /// sono trattati come esercizi coi pesi. Quelli già presenti vengono saltati.
+  /// Aggiunge in fondo un esercizio già impostato (serie, ripetizioni...),
+  /// come esce dal dialog "Aggiungi". Se è già nella scheda, non fa niente.
+  void addPlanned(WorkoutDraft workout, PlannedExercise planned) {
+    if (workout.contains(planned.exerciseId)) return;
+    workout._exercises.add(planned);
+    notifyListeners();
+  }
+
   void addExercises(WorkoutDraft workout, Iterable<String> exerciseIds, [Map<String, Exercise> library = const {}]) {
     for (final id in exerciseIds) {
       if (workout.contains(id)) continue;

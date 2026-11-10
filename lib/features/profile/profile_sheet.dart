@@ -5,7 +5,6 @@ import 'package:my_workout/features/diet_editor/diet_editor_page.dart';
 import 'package:my_workout/features/plan_editor/plan_editor_page.dart';
 import 'package:my_workout/features/profile/profile_avatar.dart';
 import 'package:my_workout/features/weigh_in/widgets/weigh_in_day_picker.dart';
-import 'package:my_workout/utils/formatters.dart';
 
 /// Apre il pannello del profilo dal basso.
 Future<void> showProfileSheet(BuildContext context) {
@@ -105,9 +104,7 @@ class ProfileSheet extends StatelessWidget {
             FilledButton.tonalIcon(
               onPressed: () => _editWeighInDay(context, profile),
               icon: const Icon(Icons.monitor_weight_outlined),
-              label: Text(
-                'Modifica giorno pesata (Attualmente è ${formatWeekday(profile.weighInWeekday)})',
-              ),
+              label: Text('Modifica giorno pesata'),
             ),
           ],
         ),

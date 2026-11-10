@@ -31,6 +31,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    // Librerie native (il motore di Flutter e il nostro codice compilato)
+    // COMPRESSE dentro l'APK: il download da GitHub passa da ~21 a ~10 MB.
+    // Il prezzo: all'installazione Android le estrae, quindi sul telefono
+    // l'app occupa qualche MB in più. Con l'AAB del Play Store ci pensa Google.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
     defaultConfig {
         // ID definitivo: non cambiarlo dopo la pubblicazione su Google Play.
         applicationId = "io.github.salvatorenapolano.myworkout"

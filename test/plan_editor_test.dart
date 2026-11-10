@@ -236,9 +236,45 @@ void main() {
 
     await tester.tap(find.text('Aggiungi (1)'));
     await tester.pumpAndSettle();
+    // Un esercizio solo: niente "1 di 1", e si conferma con Aggiungi.
+    expect(find.textContaining(' di 1'), findsNothing);
+    await tester.tap(find.widgetWithText(FilledButton, 'Aggiungi'));
+    await tester.pumpAndSettle();
     // Nella scheda Push, con l'anteprima "P" del colore del petto.
     await tester.scrollUntilVisible(find.text('Panca al multipower'), 200);
     expect(find.text('Panca al multipower'), findsOneWidget);
     expect(find.text('P'), findsOneWidget);
+  });
+
+  testWidgets('aggiungendo, "Annulla" salta l\'esercizio', (tester) async {
+    ExerciseMedia.videoEnabled = false;
+    rootBundle.clear();
+    SharedPreferences.setMockInitialValues({'onboarding_done': true, 'profile_name': 'Mario Rossi'});
+
+    await tester.pumpWidget(MyWorkoutApp(
+      weights: await WeightStore.load(),
+      bodyWeights: await BodyWeightStore.load(),
+      shopping: await ShoppingStore.load(),
+      profile: await ProfileStore.load(),
+      userData: UserDataStore(root: Directory.systemTemp.createTempSync('my_workout_utente')),
+      assets: FixtureBundle(),
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Profilo e impostazioni'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Modifica la scheda'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Push'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Aggiungi esercizi'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Croci ai cavi'));
+    await tester.pump();
+    await tester.tap(find.text('Aggiungi (1)'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Annulla'));
+    await tester.pumpAndSettle();
+    expect(find.text('Croci ai cavi'), findsNothing);
   });
 }

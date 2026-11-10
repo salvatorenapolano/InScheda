@@ -129,18 +129,33 @@ void main() {
       await tester.tap(find.text('Aggiungi (2)'));
       await tester.pumpAndSettle();
 
-      // Ci sono, con serie e recupero di default.
+      // Prima di inserirli chiede serie e ripetizioni, uno alla volta.
+      // Chest press: porto le serie a 4 e aggiungo.
+      expect(find.text('Esercizio 1 di 2'), findsOneWidget);
       expect(find.text('Chest press'), findsOneWidget);
-      expect(find.text('3 × 10 · rec. 90"'), findsNWidgets(2));
-
-      // Cambio le serie della chest press: 4.
-      await tester.tap(find.text('Chest press'));
-      await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Serie: più'));
       await tester.pump();
-      await tester.tap(find.text('Salva'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Aggiungi'));
       await tester.pumpAndSettle();
+      // Pec deck: lascio i valori di partenza.
+      expect(find.text('Esercizio 2 di 2'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Aggiungi'));
+      await tester.pumpAndSettle();
+
+      // Ci sono tutti e due, ognuno con le sue serie.
       expect(find.text('4 × 10 · rec. 90"'), findsOneWidget);
+      expect(find.text('3 × 10 · rec. 90"'), findsOneWidget);
+      // Con il numero d'ordine, come nella tab Allenamento.
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+
+      // La matita riapre il dialog: le ripetizioni della chest press a 8.
+      await tester.tap(find.byTooltip('Modifica Chest press'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '8');
+      await tester.tap(find.widgetWithText(FilledButton, 'Salva'));
+      await tester.pumpAndSettle();
+      expect(find.text('4 × 8 · rec. 90"'), findsOneWidget);
 
       // Torno alle schede: ora "Avanti" si accende.
       await tester.tap(find.byType(BackButton));
@@ -217,7 +232,7 @@ void main() {
 
       await tester.tap(find.byTooltip('Profilo e impostazioni'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Modifica giorno pesata (Attualmente è venerdì)'));
+      await tester.tap(find.text('Modifica giorno pesata'));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(ChoiceChip, 'Lun'));
       await tester.pump();
@@ -225,7 +240,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(profile.weighInWeekday, DateTime.monday);
-      expect(find.text('Modifica giorno pesata (Attualmente è lunedì)'), findsOneWidget);
     });
 
     testWidgets("finito l'onboarding le tab sono vuote: niente dati di altri", (tester) async {
