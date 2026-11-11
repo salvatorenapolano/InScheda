@@ -124,10 +124,18 @@ class UserDataStore extends ChangeNotifier {
 
   /// Aggiunge un esercizio creato dall'utente alla sua libreria personale
   /// (custom_exercises.json): da qui in poi compare nella scelta esercizi.
-  Future<void> addCustomExercise(Exercise exercise) async {
+  Future<void> addCustomExercise(Exercise exercise) => addCustomExercises([exercise]);
+
+  /// Come [addCustomExercise], ma tanti in una volta sola (un solo file
+  /// scritto): li usa l'import della scheda con l'IA.
+  Future<void> addCustomExercises(Iterable<Exercise> exercises) async {
+    if (exercises.isEmpty) return;
     final file = File('${root.path}/${WorkoutRepository.customExercisesPath}');
     final existing = await file.exists() ? jsonDecode(await file.readAsString()) as List : const [];
-    await _writeJson(WorkoutRepository.customExercisesPath, [...existing, exercise.toJson()]);
+    await _writeJson(WorkoutRepository.customExercisesPath, [
+      ...existing,
+      for (final exercise in exercises) exercise.toJson(),
+    ]);
     _hasCustomExercises = true;
     _changed();
   }

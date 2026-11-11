@@ -32,8 +32,14 @@ void main() {
     // All'inizio c'è tutto, a partire dal petto.
     expect(find.text('Chest press'), findsOneWidget);
 
-    // "alzate": le due alzate laterali, nella sezione Spalle, e nient'altro.
+    // "alzate": le quattro alzate (laterali, laterali al cavo, frontali e
+    // posteriori), tutte nella sezione Spalle, e nient'altro.
     await tester.enterText(find.byType(TextField), 'alzate');
+    await tester.pumpAndSettle();
+    expect(find.byType(CheckboxListTile), findsNWidgets(4));
+
+    // "alzate laterali": tutte e due le parole, quindi solo le laterali.
+    await tester.enterText(find.byType(TextField), 'alzate laterali');
     await tester.pumpAndSettle();
     expect(find.text('Alzate laterali con manubri'), findsOneWidget);
     expect(find.text('Alzate laterali al cavo'), findsOneWidget);

@@ -6,6 +6,8 @@ import 'package:my_workout/data/workout_repository.dart';
 import 'package:my_workout/features/plan_editor/days_editor.dart';
 import 'package:my_workout/features/plan_editor/plan_draft.dart';
 import 'package:my_workout/features/plan_editor/workouts_editor.dart';
+import 'package:my_workout/features/plan_import/plan_import.dart';
+import 'package:my_workout/features/plan_import/plan_import_page.dart';
 import 'package:my_workout/features/profile/profile_avatar.dart';
 import 'package:my_workout/features/weigh_in/widgets/weigh_in_day_picker.dart';
 import 'package:my_workout/models/body_weight.dart';
@@ -13,7 +15,12 @@ import 'package:my_workout/models/exercise.dart';
 import 'package:my_workout/utils/formatters.dart';
 
 /// Le pagine del primo avvio:
-/// benvenuto → nome → giorni → schede ed esercizi → pesata → tutto pronto.
+/// benvenuto → nome → hai già una scheda? → giorni → schede ed esercizi →
+/// pesata → tutto pronto.
+///
+/// "Hai già una scheda?" può aprire l'import con l'IA: la scheda importata
+/// riempie la bozza, e le pagine dei giorni e delle schede la mostrano già
+/// compilata, da controllare.
 ///
 /// Le pagine stanno in un PageView, il widget che mostra una pagina alla
 /// volta e scorre in orizzontale fra l'una e l'altra. Il PageController è
@@ -51,7 +58,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   // Il giorno della pesata: venerdì finché l'utente non ne sceglie un altro.
   int _weighInDay = defaultWeighInWeekday;
 
-  static const _pageCount = 6;
+  static const _pageCount = 7;
 
   // Controller e simili vanno liberati quando la pagina sparisce,
   // altrimenti restano in memoria ad ascoltare per sempre.
@@ -71,6 +78,20 @@ class _OnboardingPageState extends State<OnboardingPage> {
       duration: const Duration(milliseconds: 350),
       curve: Curves.easeOutCubic,
     );
+  }
+
+  /// "Ho un PDF o una foto": apre l'import e, se torna con una scheda, la
+  /// mette nella bozza e passa ai giorni (già scelti, da controllare).
+  Future<void> _import() async {
+    final userData = UserDataScope.of(context);
+    final navigator = Navigator.of(context);
+    final library = await _library;
+    final result = await navigator.push<PlanImport>(
+      MaterialPageRoute(builder: (_) => PlanImportPage(library: library)),
+    );
+    if (result == null) return;
+    await applyPlanImport(result: result, draft: _draft, library: library, userData: userData);
+    if (mounted) _goTo(3);
   }
 
   Future<void> _finish() async {
@@ -107,12 +128,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 children: [
                   _WelcomeStep(onNext: () => _goTo(1)),
                   _NameStep(controller: _nameController, onNext: () => _goTo(2)),
-                  _DaysStep(draft: _draft, onNext: () => _goTo(3)),
-                  _WorkoutsStep(draft: _draft, library: _library, onNext: () => _goTo(4)),
+                  _SourceStep(onScratch: () => _goTo(3), onImport: _import),
+                  _DaysStep(draft: _draft, onNext: () => _goTo(4)),
+                  _WorkoutsStep(draft: _draft, library: _library, onNext: () => _goTo(5)),
                   _WeighInStep(
                     day: _weighInDay,
                     onChanged: (day) => setState(() => _weighInDay = day),
-                    onNext: () => _goTo(5),
+                    onNext: () => _goTo(6),
                   ),
                   // Listenable.merge: si ridisegna quando cambia il nome o la
                   // scheda, così il riepilogo è sempre quello giusto.
@@ -354,6 +376,111 @@ class _NameStep extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// "Hai già una scheda?": crearla da zero o importarla con l'IA.
+/// Non ha un pulsante in fondo: si sceglie toccando una delle due card.
+class _SourceStep extends StatelessWidget {
+  const _SourceStep({required this.onScratch, required this.onImport});
+
+  final VoidCallback onScratch;
+  final VoidCallback onImport;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 32),
+            Center(
+              child: Container(
+                width: 96,
+                height: 96,
+                decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+                child: Icon(Icons.assignment_outlined, size: 48, color: colors.onPrimaryContainer),
+              ),
+            ),
+            const SizedBox(height: 32),
+            Text('Hai già una scheda?', style: theme.textTheme.headlineMedium, textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            Text(
+              'Puoi crearla qui, oppure importare quella del tuo PT.',
+              style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            _ChoiceCard(
+              icon: Icons.edit_outlined,
+              title: 'La creo da zero',
+              text: 'Scegli i giorni e gli esercizi dalla libreria.',
+              onTap: onScratch,
+            ),
+            const SizedBox(height: 12),
+            _ChoiceCard(
+              icon: Icons.auto_awesome,
+              title: 'Ho un PDF o una foto',
+              text: "La trascrive un'IA (ChatGPT, Gemini, Claude…) e tu la controlli.",
+              onTap: onImport,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Una delle due scelte di "Hai già una scheda?": tutta la card si tocca.
+class _ChoiceCard extends StatelessWidget {
+  const _ChoiceCard({required this.icon, required this.title, required this.text, required this.onTap});
+
+  final IconData icon;
+  final String title;
+  final String text;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(color: colors.primaryContainer, borderRadius: BorderRadius.circular(12)),
+                child: Icon(icon, color: colors.onPrimaryContainer),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 2),
+                    Text(text, style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

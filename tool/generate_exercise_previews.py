@@ -47,6 +47,21 @@ SEAT = ["38,40 38,86", "38,86 62,86", "52,86 52,103"]
 SEATED = ["46,80 44,50", "46,80 68,80 68,100 76,100"]
 
 
+def dumbbell(x, y):
+    """Un manubrio visto di lato, orizzontale: impugnatura e due dischi, centrato in (x, y)."""
+    return [f"{x - 6},{y} {x + 6},{y}", f"{x - 6},{y - 5} {x - 6},{y + 5}", f"{x + 6},{y - 5} {x + 6},{y + 5}"]
+
+
+def dumbbell_v(x, y):
+    """Lo stesso manubrio in verticale (presa neutra, o tenuto contro il petto)."""
+    return [f"{x},{y - 6} {x},{y + 6}", f"{x - 5},{y - 6} {x + 5},{y - 6}", f"{x - 5},{y + 6} {x + 5},{y + 6}"]
+
+
+def bench(x1, x2, y=80):
+    """Una panca piana vista di lato, da x1 a x2, con due gambe."""
+    return [f"{x1},{y} {x2},{y}", f"{x1 + 8},{y} {x1 + 8},103", f"{x2 - 8},{y} {x2 - 8},103"]
+
+
 def arc(cx, cy, r, start, end, steps=10):
     """Un arco di cerchio come polilinea (gradi: 0 = destra, 90 = giù)."""
     pts = []
@@ -234,6 +249,85 @@ POSES = {
         body=["50,44 54,74", "54,74 58,94 38,96", "50,46 58,30 60,14"],
         equip=["36,12 88,12", "86,12 86,104", "32,102 86,102"]),
 
+    # Pesi · Manubri (aggiunti l'11/11/2026)
+    # Petto: sdraiato sulla panca, testa a sinistra.
+    "panca_piana_manubri": dict(group="petto", head=(26, 70),
+        body=["36,74 70,74", "70,74 86,78 88,100 96,100", "42,73 44,46"],
+        equip=[*bench(16, 98), *dumbbell(44, 42)]),
+    "panca_inclinata_manubri": dict(group="petto", head=(30, 40),
+        body=["56,82 37,52", "56,82 78,80 80,100 88,100", "40,55 48,28"],
+        equip=["24,44 52,88", "52,88 78,88", "62,88 62,103", *dumbbell(49, 24)]),
+    # Le braccia aperte a V: l'arco delle croci.
+    "croci_manubri": dict(group="petto", head=(26, 70),
+        body=["36,74 70,74", "70,74 86,78 88,100 96,100", "42,73 34,56 30,46", "42,73 52,56 58,46"],
+        equip=[*bench(16, 98), *dumbbell(30, 42), *dumbbell(58, 42)]),
+    # Spalle
+    "lento_avanti_manubri": dict(group="spalle", head=(45, 38),
+        body=[*SEATED, "44,52 56,40 53,23"],
+        equip=[*SEAT, *dumbbell(53, 19)]),
+    # Di fronte, seduto: un braccio in alto, l'altro davanti al viso che ruota.
+    "arnold_press": dict(group="spalle", head=(60, 24),
+        body=["60,36 60,66", "60,66 48,72 48,100", "60,66 72,72 72,100",
+              "60,40 46,30 44,14", "60,40 76,50 74,34"],
+        equip=["38,70 82,70", *dumbbell(44, 10), *dumbbell_v(74, 30), arc(74, 42, 14, 300, 400)]),
+    "alzate_frontali_manubri": dict(group="spalle", head=(60, 24),
+        body=[*STANDING, "60,38 88,36", "60,38 62,64"],
+        equip=[*dumbbell(93, 36), *dumbbell(64, 68)]),
+    # Di fronte, piegato in avanti: testa bassa, busto corto (si vede di scorcio),
+    # ginocchia piegate e braccia aperte di lato.
+    "alzate_posteriori_manubri": dict(group="spalle", head=(60, 44),
+        body=["60,55 60,70", "60,70 50,86 52,100", "60,70 70,86 68,100", "60,58 34,64", "60,58 86,64"],
+        equip=[*dumbbell_v(30, 66), *dumbbell_v(90, 66)]),
+    # Schiena
+    # Ginocchio e mano sulla panca, il gomito tira in alto.
+    # La freccia: il manubrio sale verso il fianco.
+    "rematore_manubrio": dict(group="schiena", head=(88, 50),
+        body=["42,58 78,56", "42,58 48,82 30,83", "78,57 82,83", "70,57 68,74"],
+        equip=[*bench(22, 100, 84), *dumbbell(68, 76), "56,76 56,62", "52,66 56,62 60,66"]),
+    "pullover_manubrio": dict(group="schiena", head=(24, 72),
+        body=["34,75 72,74", "72,74 86,78 88,100 96,100", "40,74 26,46"],
+        equip=[*bench(16, 100), *dumbbell_v(24, 41)]),
+    # Di fronte, braccia lungo i fianchi; le frecce: spalle che salgono.
+    "scrollate_manubri": dict(group="schiena", head=(60, 24),
+        body=["60,36 60,64", *front_legs(), "60,40 48,44 46,66", "60,40 72,44 74,66"],
+        equip=[*dumbbell_v(46, 71), *dumbbell_v(74, 71),
+               "36,34 36,20", "31,25 36,20 41,25", "84,34 84,20", "79,25 84,20 89,25"]),
+    # Braccia
+    "curl_martello": dict(group="braccia", head=(60, 24),
+        body=[*STANDING, "60,38 65,53 75,42"],
+        equip=dumbbell_v(76, 38)),
+    # Seduto, busto in avanti, gomito sulla coscia.
+    "curl_concentrato": dict(group="braccia", head=(70, 44),
+        body=["44,80 62,54", "44,80 70,80 72,100 80,100", "60,57 66,77 76,62"],
+        equip=[*bench(26, 66, 86), *dumbbell(78, 59)]),
+    # Schienale molto inclinato: il braccio pende teso dietro, col manubrio in basso.
+    "curl_panca_inclinata": dict(group="braccia", head=(25, 50),
+        body=["58,82 33,59", "58,82 80,80 82,100 90,100", "34,61 34,84"],
+        equip=["18,53 50,90", "50,90 78,90", "64,90 64,103", *dumbbell(34, 88)]),
+    # Mano e ginocchio sulla panca, l'avambraccio si distende indietro.
+    "kickback_tricipiti": dict(group="braccia", head=(88, 50),
+        body=["42,58 78,56", "42,58 48,82 30,83", "78,57 82,83", "72,57 56,63 36,60"],
+        equip=[*bench(22, 100, 84), *dumbbell_v(32, 60)]),
+    # Gambe
+    "goblet_squat": dict(group="gambe", head=(59, 35),
+        body=["48,70 56,46", "48,70 70,72 64,100 76,100", "56,48 68,58 68,50"],
+        equip=dumbbell_v(70, 52)),
+    # Affondo: ginocchio davanti a 90°, quello dietro sfiora il pavimento.
+    "affondi_manubri": dict(group="gambe", head=(58, 25),
+        body=["58,37 58,66", "58,66 80,70 80,100 88,100", "58,66 46,94 28,96", "58,40 60,64"],
+        equip=dumbbell_v(60, 69)),
+    # Come l'affondo, ma col piede dietro sulla panca.
+    "bulgarian_split_squat": dict(group="gambe", head=(64, 25),
+        body=["64,37 64,66", "64,66 84,70 84,100 92,100", "64,66 50,92 30,77", "64,40 66,64"],
+        equip=[*bench(14, 42, 78), *dumbbell_v(66, 69)]),
+    # Busto in avanti dai fianchi, gambe quasi tese, manubri lungo le cosce.
+    "stacco_rumeno_manubri": dict(group="gambe", head=(87, 34),
+        body=["50,58 78,42", "50,58 54,80 54,100 62,100", "76,43 76,72"],
+        equip=dumbbell(76, 76)),
+    # Un piede sul box, l'altro ancora a terra.
+    "step_up_manubri": dict(group="gambe", head=(60, 18),
+        body=["60,30 60,56", "60,56 76,62 76,76 86,76", "60,56 52,78 46,100 38,100", "60,33 64,56"],
+        equip=["56,103 56,79 100,79 100,103", *dumbbell_v(64, 60)]),
 }
 
 

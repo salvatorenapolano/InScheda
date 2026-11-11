@@ -5,6 +5,9 @@ import 'package:my_workout/data/workout_repository.dart';
 import 'package:my_workout/features/plan_editor/days_editor.dart';
 import 'package:my_workout/features/plan_editor/plan_draft.dart';
 import 'package:my_workout/features/plan_editor/workouts_editor.dart';
+import 'package:my_workout/features/plan_import/plan_import.dart';
+import 'package:my_workout/features/plan_import/plan_import_page.dart';
+import 'package:my_workout/models/exercise.dart';
 import 'package:my_workout/widgets/save_on_exit.dart';
 
 /// "Modifica la scheda" (matita nella tab Allenamento): gli stessi pezzi
@@ -40,6 +43,36 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
     _ => null,
   };
 
+  /// "Importa con l'IA": la scheda importata sostituisce quella in modifica
+  /// (prima chiede conferma, se c'erano già degli esercizi).
+  Future<void> _import(PlanDraft draft, Map<String, Exercise> library) async {
+    final userData = UserDataScope.of(context);
+    final navigator = Navigator.of(context);
+    final hasExercises = draft.workouts.any((w) => w.exercises.isNotEmpty);
+    if (hasExercises) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Sostituire la scheda?'),
+          content: const Text(
+            'Giorni ed esercizi verranno sostituiti con quelli della scheda importata. '
+            'Prima di uscire potrai controllare tutto.',
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Annulla')),
+            FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Continua')),
+          ],
+        ),
+      );
+      if (ok != true) return;
+    }
+    final result = await navigator.push<PlanImport>(
+      MaterialPageRoute(builder: (_) => PlanImportPage(library: library)),
+    );
+    if (result == null) return;
+    await applyPlanImport(result: result, draft: draft, library: library, userData: userData);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<WorkoutData>(
@@ -74,8 +107,20 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
                 DaysEditor(draft: draft),
-                const SizedBox(height: 32),
-                Text('Schede', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 24),
+                // Il titolo "Schede" con, accanto, il pulsante per importarle:
+                // vicino a quello che cambia, e con una scritta (un'icona
+                // da sola non si capiva).
+                Row(
+                  children: [
+                    Expanded(child: Text('Schede', style: Theme.of(context).textTheme.titleMedium)),
+                    FilledButton.tonalIcon(
+                      onPressed: () => _import(draft, data.exercises),
+                      icon: const Icon(Icons.auto_awesome, size: 18),
+                      label: const Text("Importa con l'IA"),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 8),
                 WorkoutsEditor(draft: draft, library: data.exercises),
               ],

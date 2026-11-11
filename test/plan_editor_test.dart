@@ -133,6 +133,8 @@ void main() {
     expect(find.text('La tua scheda'), findsOneWidget);
     expect(find.text('Push'), findsOneWidget);
     expect(find.text('Legs'), findsOneWidget);
+    // Accanto al titolo "Schede", il pulsante per importarla con l'IA.
+    expect(find.widgetWithText(FilledButton, "Importa con l'IA"), findsOneWidget);
 
     await tester.tap(find.text('Sab'));
     await tester.pumpAndSettle();
@@ -190,9 +192,9 @@ void main() {
       expect(store.hasCustomExercises, isTrue);
 
       final library = await WorkoutRepository(bundle: store.bundleOver(rootBundle)).loadLibrary();
-      // 46 della libreria + i 2 personali, in fondo.
-      expect(library, hasLength(48));
-      expect(library.keys.skip(46), ['personale_panca_multipower', 'personale_face_pull']);
+      // 65 della libreria + i 2 personali, in fondo.
+      expect(library, hasLength(67));
+      expect(library.keys.skip(65), ['personale_panca_multipower', 'personale_face_pull']);
       expect(library['personale_face_pull']?.group, MuscleGroup.spalle);
 
       // Riaprendo lo store (riavvio dell'app) ci sono ancora.

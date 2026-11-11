@@ -22,7 +22,7 @@ App Flutter per la palestra: scheda di allenamento, dieta settimanale e pesata s
 ## Cosa fa
 
 - **Allenamento** — le tue schede (A/B/C, Push/Pull/Legs o i nomi che vuoi) che si alternano nei giorni scelti, con il giorno di turno sempre in cima. Ogni esercizio ha istruzioni, consigli, i muscoli coinvolti, spesso un video, e il peso che usi (salvato sul telefono).
-- **Libreria** — 46 esercizi divisi per gruppo muscolare (pesi, macchinari, addominali, cardio, riscaldamento), con ricerca. Se manca qualcosa, crei un esercizio tuo. Ogni esercizio si misura nel modo giusto: serie × ripetizioni, a tempo (il plank) o in minuti con velocità, pendenza o livello (tapis roulant, cyclette, stair climber).
+- **Libreria** — 65 esercizi divisi per gruppo muscolare (pesi, macchinari, addominali, cardio, riscaldamento), con ricerca. Se manca qualcosa, crei un esercizio tuo. Ogni esercizio si misura nel modo giusto: serie × ripetizioni, a tempo (il plank) o in minuti con velocità, pendenza o livello (tapis roulant, cyclette, stair climber).
 - **Dieta** — la settimana dei pasti, giorno per giorno: la scrivi tu nell'app (pasti, alimenti e quantità), con "uguale tutti i giorni" e "copia il giorno".
 - **Pesata** — promemoria nel giorno che scegli e storico delle pesate con le differenze.
 - **Spesa** — in arrivo: per ora la tab è vuota.

@@ -100,6 +100,11 @@ void main() {
       await tester.tap(avanti);
       await tester.pumpAndSettle();
 
+      // Hai già una scheda? La creo da zero.
+      expect(find.text('Hai già una scheda?'), findsOneWidget);
+      await tester.tap(find.text('La creo da zero'));
+      await tester.pumpAndSettle();
+
       // Giorni: senza giorni non si va avanti.
       expect(find.text('Quando ti alleni?'), findsOneWidget);
       expect(find.text('Scegli almeno un giorno'), findsOneWidget);

@@ -146,18 +146,51 @@ void main() {
       'squat_multipower': MuscleGroup.gambe,
       'leg_curl_sdraiato': MuscleGroup.gambe,
     };
-    expect(data.exercises, hasLength(46));
+    expect(data.exercises, hasLength(65));
     for (final MapEntry(key: id, value: group) in added.entries) {
       expect(data.exercises[id]?.group, group, reason: id);
       expect(data.exercises[id]?.hasWeight, isTrue, reason: id);
     }
   });
 
+  test('la libreria ha i 19 esercizi con i manubri, con anteprima e video', () {
+    const added = {
+      'panca_piana_manubri': MuscleGroup.petto,
+      'panca_inclinata_manubri': MuscleGroup.petto,
+      'croci_manubri': MuscleGroup.petto,
+      'lento_avanti_manubri': MuscleGroup.spalle,
+      'arnold_press': MuscleGroup.spalle,
+      'alzate_frontali_manubri': MuscleGroup.spalle,
+      'alzate_posteriori_manubri': MuscleGroup.spalle,
+      'rematore_manubrio': MuscleGroup.schiena,
+      'pullover_manubrio': MuscleGroup.schiena,
+      'scrollate_manubri': MuscleGroup.schiena,
+      'curl_martello': MuscleGroup.braccia,
+      'curl_concentrato': MuscleGroup.braccia,
+      'curl_panca_inclinata': MuscleGroup.braccia,
+      'kickback_tricipiti': MuscleGroup.braccia,
+      'goblet_squat': MuscleGroup.gambe,
+      'affondi_manubri': MuscleGroup.gambe,
+      'bulgarian_split_squat': MuscleGroup.gambe,
+      'stacco_rumeno_manubri': MuscleGroup.gambe,
+      'step_up_manubri': MuscleGroup.gambe,
+    };
+    for (final MapEntry(key: id, value: group) in added.entries) {
+      final exercise = data.exercises[id];
+      expect(exercise?.group, group, reason: id);
+      expect(exercise?.hasWeight, isTrue, reason: id);
+      expect(exercise?.tips, hasLength(3), reason: id);
+      expect(exercise?.videoUrl, startsWith('https://www.youtube.com/watch?v='), reason: id);
+      expect(File(exercise!.previewAsset).existsSync(), isTrue, reason: "$id: manca l'anteprima");
+    }
+  });
+
   test('le illustrazioni dei muscoli esistono, solo sugli esercizi coi pesi', () {
     final withImage = data.exercises.values.where((e) => e.muscleAsset != null).toList();
-    // 25 dei 28 esercizi coi pesi: iperestensioni, adductor e calf non hanno
-    // ancora un'illustrazione (mancano lombari, adduttori e polpacci).
-    expect(withImage, hasLength(25));
+    // 43 dei 47 esercizi coi pesi: iperestensioni, adductor, calf e scrollate
+    // non hanno ancora un'illustrazione (mancano lombari, adduttori, polpacci
+    // e trapezi).
+    expect(withImage, hasLength(43));
     for (final e in withImage) {
       expect(File(e.muscleAsset!).existsSync(), isTrue, reason: e.muscleAsset);
       expect(e.hasWeight, isTrue, reason: e.id);

@@ -168,6 +168,34 @@ class PlanDraft extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Sostituisce giorni, data di fine e schede con quelli importati (vedi
+  /// plan_import.dart). Il nome e l'inizio della scheda restano.
+  /// Se [weekdays] è vuota i giorni restano quelli di prima.
+  void replaceWith({
+    required List<int> weekdays,
+    required DateTime? endDate,
+    required List<(String name, List<PlannedExercise> exercises)> workouts,
+  }) {
+    if (weekdays.isNotEmpty) {
+      _weekdays
+        ..clear()
+        ..addAll(weekdays);
+    }
+    _endDate = endDate;
+    _workouts.clear();
+    for (final (name, exercises) in workouts) {
+      final workout = _newWorkout();
+      workout._name = name.trim();
+      // Niente doppioni nella stessa scheda, come con addPlanned.
+      for (final planned in exercises) {
+        if (!workout.contains(planned.exerciseId)) workout._exercises.add(planned);
+      }
+      _workouts.add(workout);
+    }
+    if (_workouts.isEmpty) _workouts.add(_newWorkout());
+    notifyListeners();
+  }
+
   /// La scheda finita, pronta da salvare. Le schede si alternano
   /// nell'ordine in cui sono scritte (la rotazione non serve).
   WorkoutPlan toPlan({required DateTime today}) {

@@ -75,7 +75,7 @@
       "Busto fermo: si muovono solo le braccia."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=HK8A6_yLBQ8"
+    "videoUrl": "https://www.youtube.com/watch?v=Pz2-x3c0UUI"
   },
   {
     "id": "rotazioni_busto",
@@ -165,7 +165,7 @@
       "Scendi in 3\", risali in 1\"."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=t6w3HS5qTQg"
+    "videoUrl": "https://www.youtube.com/watch?v=XQLmIWrDPnc"
   },
   {
     "id": "gatto_cammello",
@@ -180,7 +180,7 @@
       "Muoviti piano, una vertebra alla volta."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=SMAYXfZn_6M"
+    "videoUrl": "https://www.youtube.com/watch?v=7bu9xQt515o"
   },
   {
     "id": "ponte_glutei",
@@ -195,7 +195,7 @@
       "Stringi i glutei, non la schiena."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=EJBpPCQQPhs"
+    "videoUrl": "https://www.youtube.com/watch?v=FFVQ8IrfAOE"
   },
   {
     "id": "slanci_gamba",
@@ -258,7 +258,7 @@
       "Quando le mani si incontrano, stringi il petto per un secondo."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=E4kuxqJ8LJE",
+    "videoUrl": "https://www.youtube.com/watch?v=PSSgdS4njak",
     "muscleImage": "petto"
   },
   {
@@ -291,7 +291,7 @@
       "Scendi in 2–3\", senza lasciar cadere i manubri."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=FDCwcG71Yi0"
+    "videoUrl": "https://www.youtube.com/watch?v=6zfnhwEfDno"
   },
   {
     "id": "alzate_laterali_cavo",
@@ -306,7 +306,7 @@
       "Il cavo tiene il muscolo in tensione anche in basso: non mollare a fine discesa."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=Hq9eGPlXZe0",
+    "videoUrl": "https://www.youtube.com/watch?v=Xugjr7ACWHU",
     "muscleImage": "spalle"
   },
   {
@@ -355,7 +355,7 @@
       "Schiena appoggiata e addome contratto: non inarcare."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=Ig-wfb-Ps-8"
+    "videoUrl": "https://www.youtube.com/watch?v=UTc5Jpggvqo"
   },
 
   {
@@ -483,7 +483,7 @@
       "Scendi in 2\", senza lasciar cadere il manubrio."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=RhVdFHcHKDE"
+    "videoUrl": "https://www.youtube.com/watch?v=8MrLaUJaWUQ"
   },
 
   {
@@ -516,7 +516,7 @@
       "Togli le sicure solo quando sei ben in posizione."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=PH9uLhNr-s4"
+    "videoUrl": "https://www.youtube.com/watch?v=0tn5K9NlCfo"
   },
   {
     "id": "squat_multipower",
@@ -531,7 +531,7 @@
       "Schiena dritta e addome contratto, sguardo in avanti."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=ziKSr4CKvf4",
+    "videoUrl": "https://www.youtube.com/watch?v=UpDB8MU_Ccc",
     "muscleImage": "quadricipiti"
   },
   {
@@ -579,7 +579,7 @@
       "Discesa lenta: è lì che i femorali lavorano di più."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=Z5UayRNah7U",
+    "videoUrl": "https://www.youtube.com/watch?v=V-QKtH36WNI",
     "muscleImage": "femorali"
   },
   {
@@ -675,7 +675,7 @@
       "Respira normalmente, non trattenere il fiato."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=Is-7PPaBcsM"
+    "videoUrl": "https://www.youtube.com/watch?v=8It4m46ajlE"
   },
   {
     "id": "plank_laterale",
@@ -691,7 +691,7 @@
       "Respira normalmente."
     ],
     "images": [],
-    "videoUrl": "https://www.youtube.com/watch?v=3OHvnN-0Ros"
+    "videoUrl": "https://www.youtube.com/watch?v=kRY7K237Iks"
   },
   {
     "id": "leg_raise",
@@ -722,5 +722,308 @@
     ],
     "images": [],
     "videoUrl": "https://www.youtube.com/watch?v=be-07oGODx4"
+  },
+  {
+    "id": "panca_piana_manubri",
+    "name": "Panca piana con manubri",
+    "category": "weights",
+    "group": "petto",
+    "muscles": ["Pettorali", "Tricipiti", "Spalle"],
+    "muscleImage": "petto",
+    "description": "Sdraiato sulla panca, piedi a terra e scapole strette indietro. Parti con i manubri sopra il petto, scendi piegando i gomiti finché senti il petto allungarsi, poi spingi di nuovo in alto avvicinando i manubri.",
+    "tips": [
+      "Gomiti a circa 45° dal busto, non aperti a 90°.",
+      "Per partire siediti con i manubri sulle cosce e sdraiati portandoli al petto.",
+      "Scendi in 2–3\", senza far rimbalzare il peso."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=2lVusURJNOQ"
+  },
+  {
+    "id": "panca_inclinata_manubri",
+    "name": "Panca inclinata con manubri",
+    "category": "weights",
+    "group": "petto",
+    "muscles": ["Pettorali (parte alta)", "Spalle", "Tricipiti"],
+    "muscleImage": "petto",
+    "description": "Schienale inclinato di 30–45°, schiena e glutei appoggiati. Scendi con i manubri ai lati del petto alto, poi spingi verso l'alto fin sopra le spalle.",
+    "tips": [
+      "Meglio un'inclinazione bassa (30°): più è alta, più lavorano le spalle.",
+      "Scapole indietro e petto in fuori per tutta la serie.",
+      "In alto non far sbattere i manubri: fermati appena prima."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=NRlgbfBg5mg"
+  },
+  {
+    "id": "croci_manubri",
+    "name": "Croci con manubri su panca piana",
+    "category": "weights",
+    "group": "petto",
+    "muscles": ["Pettorali"],
+    "muscleImage": "petto",
+    "description": "Sdraiato sulla panca, manubri sopra il petto con i palmi uno verso l'altro. Apri le braccia ad arco con i gomiti appena piegati, scendi finché senti il petto allungarsi, poi richiudi lo stesso arco.",
+    "tips": [
+      "I gomiti restano piegati sempre allo stesso modo: è un abbraccio, non una spinta.",
+      "Non scendere oltre la linea delle spalle.",
+      "Pesi leggeri: qui conta il controllo, non il carico."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=pVbCi77uzXI"
+  },
+  {
+    "id": "lento_avanti_manubri",
+    "name": "Lento avanti con manubri",
+    "category": "weights",
+    "group": "spalle",
+    "muscles": ["Spalle", "Tricipiti"],
+    "muscleImage": "spalle",
+    "description": "Seduto con lo schienale dritto, manubri all'altezza delle spalle e palmi in avanti. Spingi verso l'alto finché le braccia sono quasi tese, poi torna giù controllato.",
+    "tips": [
+      "Schiena appoggiata: non inarcare la zona lombare.",
+      "In basso i gomiti restano un po' in avanti, non aperti del tutto ai lati.",
+      "Espira mentre spingi, inspira mentre scendi."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=7szY4TUsJag"
+  },
+  {
+    "id": "arnold_press",
+    "name": "Arnold press",
+    "category": "weights",
+    "group": "spalle",
+    "muscles": ["Spalle", "Tricipiti"],
+    "muscleImage": "spalle",
+    "description": "Seduto, manubri davanti al viso con i palmi verso di te. Mentre spingi in alto ruota i polsi, così in cima i palmi guardano avanti; scendendo fai la rotazione al contrario.",
+    "tips": [
+      "Rotazione e spinta insieme, in un solo movimento fluido.",
+      "Usa meno peso che nel lento avanti: la rotazione lo rende più difficile.",
+      "Busto fermo e addome contratto."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=ZHihmzAQeMk"
+  },
+  {
+    "id": "alzate_frontali_manubri",
+    "name": "Alzate frontali con manubri",
+    "category": "weights",
+    "group": "spalle",
+    "muscles": ["Spalle"],
+    "muscleImage": "spalle",
+    "description": "In piedi, manubri davanti alle cosce. Sali con le braccia tese davanti a te fino all'altezza delle spalle, gomiti appena piegati, poi scendi lentamente. Puoi alternare le braccia.",
+    "tips": [
+      "Non salire oltre l'altezza degli occhi.",
+      "Niente slancio con la schiena: se dondoli, il peso è troppo.",
+      "Scendi in 2–3\", senza lasciar cadere i manubri."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=2lS5krICNIA"
+  },
+  {
+    "id": "alzate_posteriori_manubri",
+    "name": "Alzate posteriori a busto flesso",
+    "category": "weights",
+    "group": "spalle",
+    "muscles": ["Spalle (parte posteriore)", "Trapezi"],
+    "muscleImage": "spalle",
+    "description": "In piedi, busto piegato in avanti quasi parallelo al pavimento, schiena dritta. Con i manubri sotto il petto e i gomiti appena piegati, apri le braccia di lato fino all'altezza delle spalle, poi torna giù.",
+    "tips": [
+      "Puoi farle anche seduto, col petto appoggiato alle cosce o su una panca inclinata.",
+      "Pensa ad allargare le braccia, non a stringere le scapole.",
+      "Pesi leggeri e movimento lento."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=jEL3AaFPJIQ"
+  },
+  {
+    "id": "rematore_manubrio",
+    "name": "Rematore con manubrio a un braccio",
+    "category": "weights",
+    "group": "schiena",
+    "muscles": ["Dorsali", "Trapezi", "Bicipiti"],
+    "muscleImage": "dorsali",
+    "description": "Un ginocchio e una mano sulla panca, l'altro piede a terra, schiena piatta. Tira il manubrio verso il fianco portando il gomito indietro e vicino al corpo, poi distendi il braccio piano.",
+    "tips": [
+      "Il gomito va verso l'anca, non verso l'alto.",
+      "Il busto non ruota: si muove solo il braccio.",
+      "In basso lascia allungare la schiena, in alto fermati 1 secondo."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=FLUlpw4YjCA"
+  },
+  {
+    "id": "pullover_manubrio",
+    "name": "Pullover con manubrio",
+    "category": "weights",
+    "group": "schiena",
+    "muscles": ["Dorsali", "Pettorali"],
+    "muscleImage": "dorsali",
+    "description": "Sdraiato sulla panca, manubrio tenuto con due mani sopra il petto. Con i gomiti appena piegati portalo indietro oltre la testa finché senti allungarsi dorsali e petto, poi riportalo sopra il petto.",
+    "tips": [
+      "Mani a coppa sotto il disco di sopra, come nella French press.",
+      "I gomiti non si piegano durante il movimento: si muovono solo le spalle.",
+      "Scendi solo fin dove le spalle stanno bene."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=xJNGfBdQ85A"
+  },
+  {
+    "id": "scrollate_manubri",
+    "name": "Scrollate con manubri",
+    "category": "weights",
+    "group": "schiena",
+    "muscles": ["Trapezi"],
+    "description": "In piedi, braccia tese lungo i fianchi con i manubri. Solleva le spalle verso le orecchie, tieni un secondo in alto e scendi lentamente.",
+    "tips": [
+      "Solo su e giù: non ruotare le spalle.",
+      "Le braccia restano tese: non piegare i gomiti.",
+      "Testa dritta e sguardo avanti."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=xsadROP_MXw"
+  },
+  {
+    "id": "curl_martello",
+    "name": "Curl a martello",
+    "category": "weights",
+    "group": "braccia",
+    "muscles": ["Bicipiti", "Avambracci"],
+    "muscleImage": "bicipiti",
+    "description": "In piedi, manubri lungo i fianchi con i palmi rivolti verso le gambe. Piega il gomito e sali tenendo il polso così, come se impugnassi un martello, poi scendi.",
+    "tips": [
+      "Gomiti fermi ai fianchi.",
+      "Il palmo non ruota mai: resta rivolto verso il corpo.",
+      "Puoi alternare le braccia o salire con tutte e due insieme."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=OPqe0kCxmR8"
+  },
+  {
+    "id": "curl_concentrato",
+    "name": "Curl concentrato",
+    "category": "weights",
+    "group": "braccia",
+    "muscles": ["Bicipiti"],
+    "muscleImage": "bicipiti",
+    "description": "Seduto sulla panca, gambe aperte e busto in avanti. Appoggia il gomito all'interno della coscia e porta il manubrio verso la spalla, poi distendi il braccio piano.",
+    "tips": [
+      "Il braccio sta fermo sulla coscia: si muove solo l'avambraccio.",
+      "In alto stringi il bicipite per un secondo.",
+      "Il busto non si alza per aiutare il braccio."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=z_JO3xUShew"
+  },
+  {
+    "id": "curl_panca_inclinata",
+    "name": "Curl su panca inclinata",
+    "category": "weights",
+    "group": "braccia",
+    "muscles": ["Bicipiti"],
+    "muscleImage": "bicipiti",
+    "description": "Seduto su una panca inclinata a circa 45°, braccia tese verso il basso. Piega i gomiti senza spostarli in avanti e porta i manubri verso le spalle, poi scendi fino in fondo.",
+    "tips": [
+      "Usa pesi più leggeri del curl in piedi: il bicipite parte già allungato.",
+      "Spalle e testa appoggiate allo schienale.",
+      "Scendi lento, fino a braccia tese."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=W-SQIObaVO8"
+  },
+  {
+    "id": "kickback_tricipiti",
+    "name": "Kickback per tricipiti",
+    "category": "weights",
+    "group": "braccia",
+    "muscles": ["Tricipiti"],
+    "muscleImage": "tricipiti",
+    "description": "Una mano e un ginocchio sulla panca, busto in avanti e schiena piatta. Braccio vicino al fianco e gomito piegato: distendi l'avambraccio indietro finché il braccio è tutto dritto, poi torna piano.",
+    "tips": [
+      "Il gomito resta fermo, alto e vicino al corpo.",
+      "Peso leggero: bastano pochi chili.",
+      "In fondo tieni il braccio teso per un secondo."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=PEYoLmpZEX4"
+  },
+  {
+    "id": "goblet_squat",
+    "name": "Goblet squat",
+    "category": "weights",
+    "group": "gambe",
+    "muscles": ["Quadricipiti", "Glutei"],
+    "muscleImage": "quadricipiti",
+    "description": "In piedi, piedi poco più larghi delle spalle, un manubrio tenuto in verticale contro il petto. Scendi piegando le ginocchia e portando i fianchi indietro, petto alto, almeno fino a cosce parallele; poi risali spingendo coi talloni.",
+    "tips": [
+      "Le ginocchia seguono la direzione delle punte dei piedi.",
+      "In basso i gomiti stanno dentro le ginocchia: aiutano a tenere il busto dritto.",
+      "Talloni sempre a terra."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=jnm_rsBb1Gc"
+  },
+  {
+    "id": "affondi_manubri",
+    "name": "Affondi con manubri",
+    "category": "weights",
+    "group": "gambe",
+    "muscles": ["Quadricipiti", "Glutei"],
+    "muscleImage": "quadricipiti",
+    "description": "In piedi, manubri lungo i fianchi. Fai un passo avanti e scendi finché il ginocchio dietro sfiora il pavimento, poi spingi col piede davanti e torna su. Alterna le gambe, sul posto o camminando.",
+    "tips": [
+      "Busto dritto e sguardo avanti.",
+      "Il ginocchio davanti resta sopra il piede: non deve cadere verso l'interno.",
+      "Passo lungo per i glutei, più corto per i quadricipiti."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=2APsnwHatdY"
+  },
+  {
+    "id": "bulgarian_split_squat",
+    "name": "Bulgarian split squat",
+    "category": "weights",
+    "group": "gambe",
+    "muscles": ["Quadricipiti", "Glutei"],
+    "muscleImage": "glutei",
+    "description": "Di spalle alla panca, il collo del piede dietro appoggiato sopra. Con i manubri lungo i fianchi scendi in verticale sulla gamba davanti, poi risali spingendo col tallone. Finisci un lato e poi cambia.",
+    "tips": [
+      "Trova la distanza giusta dalla panca prima di prendere i manubri.",
+      "Quasi tutto il peso è sulla gamba davanti: quella dietro serve solo all'equilibrio.",
+      "Busto un po' in avanti per far lavorare di più i glutei."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=Fmjj7wFJWRE"
+  },
+  {
+    "id": "stacco_rumeno_manubri",
+    "name": "Stacco rumeno con manubri",
+    "category": "weights",
+    "group": "gambe",
+    "muscles": ["Femorali", "Glutei", "Lombari"],
+    "muscleImage": "femorali",
+    "description": "In piedi, manubri davanti alle cosce e ginocchia appena piegate. Spingi i fianchi indietro e scendi con la schiena dritta, manubri vicini alle gambe, finché senti tirare dietro le cosce; poi risali portando i fianchi in avanti.",
+    "tips": [
+      "La schiena non si incurva mai: se succede, fermati prima.",
+      "Le ginocchia restano quasi ferme: si muove il bacino.",
+      "In alto stringi i glutei, senza inarcare la schiena."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=JF6lUckW4nY"
+  },
+  {
+    "id": "step_up_manubri",
+    "name": "Step-up su panca con manubri",
+    "category": "weights",
+    "group": "gambe",
+    "muscles": ["Quadricipiti", "Glutei"],
+    "muscleImage": "glutei",
+    "description": "Davanti a una panca o a un box stabile, manubri lungo i fianchi. Appoggia sopra tutto il piede e sali spingendo con quella gamba, poi scendi piano con l'altra. Finisci un lato e poi cambia.",
+    "tips": [
+      "Spingi col tallone del piede che sta sopra, non con la gamba a terra.",
+      "Panca all'altezza del ginocchio o poco meno.",
+      "Scendi controllato, senza saltare giù."
+    ],
+    "images": [],
+    "videoUrl": "https://www.youtube.com/watch?v=sl9KOnqsDSM"
   }
 ]
