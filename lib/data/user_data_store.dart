@@ -6,12 +6,14 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:my_workout/data/diet_repository.dart';
 import 'package:my_workout/data/data_bundle.dart';
+import 'package:my_workout/data/shopping_repository.dart';
 import 'package:my_workout/data/workout_repository.dart';
 import 'package:my_workout/models/diet.dart';
 import 'package:my_workout/models/exercise.dart';
+import 'package:my_workout/models/shopping.dart';
 import 'package:my_workout/models/workout_plan.dart';
 
-/// I dati creati dall'utente nell'app (scheda, dieta, esercizi suoi), salvati sul
+/// I dati creati dall'utente nell'app (scheda, dieta, spesa, esercizi suoi), salvati sul
 /// telefono come file JSON.
 ///
 /// L'idea: invece di inventare un formato nuovo, salviamo la scheda
@@ -32,6 +34,7 @@ class UserDataStore extends ChangeNotifier {
     required this.root,
     this._hasPlan = false,
     this._hasDiet = false,
+    this._hasShopping = false,
     this._hasCustomExercises = false,
   });
 
@@ -47,6 +50,7 @@ class UserDataStore extends ChangeNotifier {
       root: root,
       hasPlan: await File('${root.path}/${WorkoutRepository.planPath}').exists(),
       hasDiet: await File('${root.path}/${DietRepository.dietPath}').exists(),
+      hasShopping: await File('${root.path}/${ShoppingRepository.shoppingPath}').exists(),
       hasCustomExercises: await File('${root.path}/${WorkoutRepository.customExercisesPath}').exists(),
     );
   }
@@ -55,6 +59,7 @@ class UserDataStore extends ChangeNotifier {
 
   bool _hasPlan;
   bool _hasDiet;
+  bool _hasShopping;
   bool _hasCustomExercises;
   int _revision = 0;
 
@@ -68,6 +73,9 @@ class UserDataStore extends ChangeNotifier {
 
   /// true se l'utente ha salvato una sua dieta.
   bool get hasDiet => _hasDiet;
+
+  /// true se l'utente ha salvato una sua lista della spesa.
+  bool get hasShopping => _hasShopping;
 
   /// true se l'utente ha creato almeno un esercizio suo.
   bool get hasCustomExercises => _hasCustomExercises;
@@ -89,7 +97,7 @@ class UserDataStore extends ChangeNotifier {
     // identical(): è proprio lo stesso oggetto di prima?
     if (cached != null && identical(_bundleBelow, below)) return cached;
     _bundleBelow = below;
-    final hasFiles = _hasPlan || _hasDiet || _hasCustomExercises;
+    final hasFiles = _hasPlan || _hasDiet || _hasShopping || _hasCustomExercises;
     return _bundle = DataBundle(hasFiles ? root : null, below);
   }
 
@@ -104,6 +112,13 @@ class UserDataStore extends ChangeNotifier {
   Future<void> saveDiet(Diet diet) async {
     await _writeJson(DietRepository.dietPath, diet.toJson());
     _hasDiet = true;
+    _changed();
+  }
+
+  /// Salva la spesa dell'utente (liste e reparti suoi): la tab Spesa mostrerà questa.
+  Future<void> saveShopping(ShoppingData shopping) async {
+    await _writeJson(ShoppingRepository.shoppingPath, shopping.toJson());
+    _hasShopping = true;
     _changed();
   }
 

@@ -50,6 +50,17 @@ class ShoppingStore extends ChangeNotifier {
     await _persist();
   }
 
+  /// Dimentica le spunte dei prodotti che non ci sono più (dopo aver
+  /// salvato la lista). Così un prodotto nuovo che riprende l'id di uno
+  /// cancellato non parte già spuntato.
+  Future<void> retainOnly(Set<String> itemIds) async {
+    final before = _checked.length;
+    _checked.retainWhere(itemIds.contains);
+    if (_checked.length == before) return;
+    notifyListeners();
+    await _persist();
+  }
+
   Future<void> _persist() => _prefs.setStringList(_key, _checked.toList());
 }
 

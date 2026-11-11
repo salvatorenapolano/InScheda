@@ -11,25 +11,23 @@ class ShoppingRepository {
 
   final AssetBundle _bundle;
 
-  static const _path = 'assets/data/shopping.json';
+  /// Dove sta la spesa: negli asset (test) o nella cartella dell'utente.
+  static const shoppingPath = 'assets/data/shopping.json';
 
   /// null = l'utente non ha (ancora) una lista della spesa.
-  Future<List<ShoppingList>?> load() async {
-    final json = await _bundle.loadStringOrNull(_path);
+  Future<ShoppingData?> load() async {
+    final json = await _bundle.loadStringOrNull(shoppingPath);
     return json == null ? null : parse(json);
   }
 
-  static List<ShoppingList> parse(String json) {
-    final data = jsonDecode(json) as Map<String, dynamic>;
-    final lists = [
-      for (final l in data['lists'] as List) ShoppingList.fromJson(l as Map<String, dynamic>),
-    ];
+  static ShoppingData parse(String json) {
+    final data = ShoppingData.fromJson(jsonDecode(json) as Map<String, dynamic>);
 
     // Gli id servono a ricordare le spunte: due prodotti con lo stesso id
     // si spunterebbero insieme. Meglio accorgersene subito.
     final seen = <String>{};
     final duplicates = [
-      for (final list in lists)
+      for (final list in data.lists)
         for (final item in list.items)
           // Set.add restituisce false se l'elemento c'era già.
           if (!seen.add(item.id)) item.id,
@@ -37,6 +35,6 @@ class ShoppingRepository {
     if (duplicates.isNotEmpty) {
       throw FormatException('shopping.json: id ripetuti: ${duplicates.join(', ')}');
     }
-    return lists;
+    return data;
   }
 }

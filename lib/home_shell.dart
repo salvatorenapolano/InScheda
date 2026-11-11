@@ -20,7 +20,13 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   // Lo "stato": l'indice della tab attiva (0 = Allenamento).
   // Il trattino basso iniziale lo rende privato a questo file.
-  int _selectedIndex = 0;
+  //
+  // Quando salvi scheda, dieta o spesa l'app ricrea questo widget (Key
+  // nuova) e lo stato ripartirebbe da 0: finiresti su Allenamento. Per
+  // questo la tab scelta si "appunta" anche nel PageStorage della pagina,
+  // che resta lo stesso, e da lì si rilegge.
+  static const _storageId = 'home_tab';
+  late int _selectedIndex = PageStorage.maybeOf(context)?.readState(context, identifier: _storageId) as int? ?? 0;
 
   static const _pages = <Widget>[
     WorkoutPage(),
@@ -45,6 +51,7 @@ class _HomeShellState extends State<HomeShell> {
           setState(() {
             _selectedIndex = index;
           });
+          PageStorage.maybeOf(context)?.writeState(context, index, identifier: _storageId);
         },
         destinations: const [
           NavigationDestination(

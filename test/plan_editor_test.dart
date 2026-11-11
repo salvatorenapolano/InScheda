@@ -136,9 +136,11 @@ void main() {
 
     await tester.tap(find.text('Sab'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Salva'));
-    // Salvare scrive un file vero: aspettiamo che l'editor si chiuda.
+    // Torno indietro: la scheda si salva da sola. Salvare scrive un file
+    // vero: aspettiamo che l'editor si chiuda.
+    await tester.tap(find.byType(BackButton));
     await pumpUntil(tester, () => find.text('La tua scheda').evaluate().isEmpty);
+    expect(find.text('Scheda salvata'), findsOneWidget);
 
     expect(userData.hasPlan, isTrue);
     final saved = await tester.runAsync(

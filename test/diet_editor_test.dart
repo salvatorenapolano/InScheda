@@ -199,12 +199,14 @@ void main() {
     expect(find.text('Pasta'), findsOneWidget);
     expect(find.text('90 g'), findsOneWidget);
 
-    await tester.tap(find.text('Salva'));
+    // Niente pulsante Salva: torno indietro e la dieta si salva da sola.
+    expect(find.text('Scrivi almeno un pasto'), findsNothing);
+    await tester.tap(find.byType(BackButton));
     await pumpUntil(tester, () => find.text('La tua dieta').evaluate().isEmpty);
+    expect(find.text('Dieta salvata'), findsOneWidget);
 
-    // Salvata: la tab Dieta ora la mostra (si legge da file, tempo vero).
+    // Salvata: si resta sulla tab Dieta, che ora la mostra (si legge da file, tempo vero).
     expect(userData.hasDiet, isTrue);
-    await tester.tap(find.text('Dieta'));
     await pumpUntil(tester, () => find.text('Pasta').evaluate().isNotEmpty);
     expect(find.text('Nessuna dieta'), findsNothing);
   });

@@ -7,13 +7,14 @@ import 'package:my_workout/features/diet_editor/diet_draft.dart';
 import 'package:my_workout/features/diet_editor/food_item_dialog.dart';
 import 'package:my_workout/models/diet.dart';
 import 'package:my_workout/models/workout_plan.dart';
+import 'package:my_workout/widgets/save_on_exit.dart';
 import 'package:my_workout/widgets/text_input_dialog.dart';
 
 /// L'editor della dieta: una scheda per giorno (Lun … Dom), in ognuna i
 /// pasti accesi (pranzo, cena...) con il nome del piatto e gli alimenti.
 ///
-/// Si apre dalla tab Dieta vuota ("Crea la dieta") o dal profilo. Come per
-/// la scheda, niente cambia finché non premi Salva.
+/// Si apre dalla tab Dieta vuota ("Crea la dieta") o dalla matita accanto
+/// al titolo. Come per la scheda, si salva da sola quando torni indietro.
 class DietEditorPage extends StatefulWidget {
   const DietEditorPage({super.key});
 
@@ -27,7 +28,6 @@ class _DietEditorPageState extends State<DietEditorPage> {
   late final Future<(Diet?, WorkoutPlan?)> _data = _load();
 
   DietDraft? _draft;
-  bool _saving = false;
 
   Future<(Diet?, WorkoutPlan?)> _load() async {
     final bundle = DefaultAssetBundle.of(context);
@@ -42,13 +42,7 @@ class _DietEditorPageState extends State<DietEditorPage> {
     super.dispose();
   }
 
-  Future<void> _save(DietDraft draft, WorkoutPlan? plan) async {
-    setState(() => _saving = true);
-    final navigator = Navigator.of(context);
-    final diet = draft.toDiet(trainingWeekdays: {...?plan?.schedule.weekdays});
-    await UserDataScope.of(context).saveDiet(diet);
-    navigator.pop();
-  }
+  static String? _problem(DietDraft draft) => draft.hasContent ? null : 'Scrivi almeno un pasto';
 
   Future<void> _copyDay(BuildContext context, DietDraft draft) async {
     // Il giorno aperto: lo sa il DefaultTabController sopra di noi.
@@ -72,47 +66,54 @@ class _DietEditorPageState extends State<DietEditorPage> {
           );
         }
         if (!snapshot.hasData) {
-          return Scaffold(appBar: AppBar(), body: const Center(child: CircularProgressIndicator()));
+          return Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: CircularProgressIndicator()),
+          );
         }
         // Il record si "spacchetta" in due variabili.
         final (diet, plan) = snapshot.requireData;
         final draft = _draft ??= diet == null ? DietDraft() : DietDraft.fromDiet(diet);
         final today = DateTime.now().weekday - 1;
 
-        return DefaultTabController(
-          length: 7,
-          initialIndex: today,
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text('La tua dieta'),
-              actions: [
-                // Builder: un context che sta DENTRO il DefaultTabController.
-                Builder(
-                  builder: (context) => IconButton(
-                    tooltip: 'Copia il giorno',
-                    onPressed: () => _copyDay(context, draft),
-                    icon: const Icon(Icons.copy_all_outlined),
+        final userData = UserDataScope.of(context);
+
+        return SaveOnExit(
+          draft: draft,
+          problem: () => _problem(draft),
+          onSave: () => userData.saveDiet(draft.toDiet(trainingWeekdays: {...?plan?.schedule.weekdays})),
+          savedMessage: 'Dieta salvata',
+          child: DefaultTabController(
+            length: 7,
+            initialIndex: today,
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text('La tua dieta'),
+                actions: [
+                  // Builder: un context che sta DENTRO il DefaultTabController.
+                  Builder(
+                    builder: (context) => IconButton(
+                      tooltip: 'Copia il giorno',
+                      onPressed: () => _copyDay(context, draft),
+                      icon: const Icon(Icons.copy_all_outlined),
+                    ),
                   ),
+                ],
+                bottom: TabBar(
+                  tabs: [for (final name in DietDraft.dayNames) Tab(text: name.substring(0, 3))],
+                  labelPadding: EdgeInsets.zero,
                 ),
-              ],
-              bottom: TabBar(
-                tabs: [for (final name in DietDraft.dayNames) Tab(text: name.substring(0, 3))],
-                labelPadding: EdgeInsets.zero,
               ),
-            ),
-            body: TabBarView(
-              children: [for (var day = 0; day < 7; day++) _DayEditor(draft: draft, day: day)],
-            ),
-            bottomNavigationBar: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                child: ListenableBuilder(
-                  listenable: draft,
-                  builder: (context, _) => FilledButton(
-                    onPressed: draft.hasContent && !_saving ? () => _save(draft, plan) : null,
-                    child: Text(draft.hasContent ? 'Salva' : 'Scrivi almeno un pasto'),
-                  ),
-                ),
+              body: TabBarView(
+                children: [for (var day = 0; day < 7; day++) _DayEditor(draft: draft, day: day)],
+              ),
+              // Niente pulsante Salva: in fondo compare solo cosa manca, se manca qualcosa.
+              bottomNavigationBar: ListenableBuilder(
+                listenable: draft,
+                builder: (context, _) => switch (_problem(draft)) {
+                  final problem? => EditorProblemBar(problem: problem),
+                  null => const SizedBox.shrink(),
+                },
               ),
             ),
           ),
@@ -175,11 +176,8 @@ class _MealEditor extends StatelessWidget {
   Future<void> _editTitle(BuildContext context, MealDraft meal) async {
     final title = await showDialog<String>(
       context: context,
-      builder: (context) => TextInputDialog(
-        title: 'Nome del piatto',
-        initialText: meal.title,
-        hint: 'Es. Pasta al tonno (facoltativo)',
-      ),
+      builder: (context) =>
+          TextInputDialog(title: 'Nome del piatto', initialText: meal.title, hint: 'Es. Pasta al tonno (facoltativo)'),
     );
     if (title != null) draft.setTitle(day, slot.id, title);
   }
@@ -193,9 +191,7 @@ class _MealEditor extends StatelessWidget {
         context: context,
         builder: (context) => AlertDialog(
           title: Text('${slot.name} uguale tutti i giorni?'),
-          content: Text(
-            'Il ${slot.name.toLowerCase()} di $dayName sostituirà quello scritto negli altri giorni.',
-          ),
+          content: Text('Il ${slot.name.toLowerCase()} di $dayName sostituirà quello scritto negli altri giorni.'),
           actions: [
             TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Annulla')),
             FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Sostituisci')),
@@ -237,7 +233,10 @@ class _MealEditor extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Text(
                 [?slot.emoji, slot.name].join('  '),
-                style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             // La spunta: questo pasto è lo stesso dal lunedì alla domenica.

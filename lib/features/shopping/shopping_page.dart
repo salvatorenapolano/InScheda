@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:my_workout/data/shopping_repository.dart';
 import 'package:my_workout/data/shopping_store.dart';
+import 'package:my_workout/features/shopping/widgets/department_badge.dart';
+import 'package:my_workout/features/shopping_editor/shopping_editor_page.dart';
 import 'package:my_workout/models/shopping.dart';
 import 'package:my_workout/widgets/dividers.dart';
 import 'package:my_workout/widgets/empty_state.dart';
 import 'package:my_workout/widgets/main_app_bar.dart';
 import 'package:my_workout/widgets/page_title.dart';
 
-/// Tab "Spesa": due schede (Settimanale, Mensile) con i prodotti da
+/// Tab "Spesa": una scheda per lista, con i prodotti divisi per reparto da
 /// spuntare, e il tasto Reset sempre visibile in basso a destra.
 class ShoppingPage extends StatefulWidget {
   const ShoppingPage({super.key});
@@ -20,13 +22,16 @@ class ShoppingPage extends StatefulWidget {
 class _ShoppingPageState extends State<ShoppingPage> {
   // Il bundle dei dati: prima quelli dell'utente, poi quelli dell'app.
   // null = l'utente non ha ancora una lista.
-  late final Future<List<ShoppingList>?> _listsFuture =
-      ShoppingRepository(bundle: DefaultAssetBundle.of(context)).load();
+  late final Future<ShoppingData?> _dataFuture = ShoppingRepository(bundle: DefaultAssetBundle.of(context)).load();
+
+  void _openEditor() {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ShoppingEditorPage()));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ShoppingList>?>(
-      future: _listsFuture,
+    return FutureBuilder<ShoppingData?>(
+      future: _dataFuture,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _simplePage(Text('Non riesco a leggere la lista della spesa:\n${snapshot.error}'));
@@ -36,16 +41,17 @@ class _ShoppingPageState extends State<ShoppingPage> {
         if (snapshot.connectionState != ConnectionState.done) {
           return _simplePage(const CircularProgressIndicator());
         }
-        final lists = snapshot.data;
-        if (lists == null) {
-          return _simplePage(const EmptyState(
+        final data = snapshot.data;
+        if (data == null || data.lists.isEmpty) {
+          return _simplePage(EmptyState(
             icon: Icons.shopping_cart_outlined,
             title: 'Nessuna lista della spesa',
-            message: 'Qui vedrai i prodotti da comprare, da spuntare al supermercato. '
-                'Presto potrai inserirli dall\'app.',
+            message: 'Scrivi i prodotti da comprare, divisi per reparto, e spuntali al supermercato.',
+            actionLabel: 'Crea la lista',
+            onAction: _openEditor,
           ));
         }
-        return _buildLists(lists);
+        return _buildLists(data);
       },
     );
   }
@@ -57,34 +63,36 @@ class _ShoppingPageState extends State<ShoppingPage> {
     );
   }
 
-  Widget _buildLists(List<ShoppingList> lists) {
+  Widget _buildLists(ShoppingData data) {
+    final lists = data.lists;
+    // Con una lista sola le schede non servono: resta solo il titolo.
+    final showTabs = lists.length > 1;
+
     // Come nella Dieta: DefaultTabController tiene allineate le schede in
     // alto (TabBar) e le pagine sotto (TabBarView).
     return DefaultTabController(
       length: lists.length,
       child: Scaffold(
         appBar: MainAppBar(
-          // Come nella Dieta: il titolo sopra le schede delle liste. Per ora
-          // senza pulsante di modifica (l'editor della spesa arriverà dopo).
+          // Come nella Dieta: il titolo con la matita sopra le schede delle liste.
           bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(56 + kTextTabBarHeight),
+            preferredSize: Size.fromHeight(56 + (showTabs ? kTextTabBarHeight : 0)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  // Alto 48 come il titolo della Dieta col suo pulsante:
-                  // così le due tab hanno l'header della stessa altezza.
-                  child: SizedBox(
-                    height: 48,
-                    child: Align(alignment: Alignment.centerLeft, child: PageTitle(title: 'Spesa')),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: PageTitle(title: 'Spesa', editTooltip: 'Modifica la spesa', onEdit: _openEditor),
+                ),
+                if (showTabs)
+                  TabBar(
+                    tabs: [for (final list in lists) Tab(text: list.name)],
+                    // Con più di 3 liste le schede scorrono invece di schiacciarsi.
+                    isScrollable: lists.length > 3,
+                    tabAlignment: lists.length > 3 ? TabAlignment.start : null,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    indicatorPadding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
                   ),
-                ),
-                TabBar(
-                  tabs: [for (final list in lists) Tab(text: list.name)],
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  indicatorPadding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
-                ),
               ],
             ),
           ),
@@ -102,7 +110,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
           ),
         ),
         body: TabBarView(
-          children: [for (final list in lists) _ShoppingListView(list: list)],
+          children: [for (final list in lists) _ShoppingListView(data: data, list: list)],
         ),
       ),
     );
@@ -116,63 +124,99 @@ class _ShoppingPageState extends State<ShoppingPage> {
 
     messenger.hideCurrentSnackBar();
     if (removed.isEmpty) {
-      messenger.showSnackBar(
-        SnackBar(content: Text('Nessuna spunta nella spesa ${list.name.toLowerCase()}')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text('Nessuna spunta in "${list.name}"')));
       return;
     }
     messenger.showSnackBar(
       SnackBar(
-        content: Text('Spunte tolte dalla spesa ${list.name.toLowerCase()}'),
+        content: Text('Spunte tolte da "${list.name}"'),
         action: SnackBarAction(label: 'Annulla', onPressed: () => store.checkAll(removed)),
       ),
     );
   }
 }
 
-/// Una scheda: le sezioni una sotto l'altra, ognuna nella sua card.
+/// Una scheda: i reparti uno sotto l'altro, ognuno nella sua card richiudibile.
 class _ShoppingListView extends StatelessWidget {
-  const _ShoppingListView({required this.list});
+  const _ShoppingListView({required this.data, required this.list});
 
+  final ShoppingData data;
   final ShoppingList list;
+
+  @override
+  Widget build(BuildContext context) {
+    if (list.items.isEmpty) {
+      return const EmptyState(
+        icon: Icons.shopping_basket_outlined,
+        title: 'Lista vuota',
+        message: 'Aggiungi i prodotti con la matita accanto a "Spesa".',
+      );
+    }
+    return ListView(
+      // In fondo più spazio: l'ultima riga non finisce sotto il tasto Reset.
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+      children: [
+        for (final (index, section) in list.sections.indexed)
+          _SectionCard(
+            // PageStorageKey: ExpansionTile si "appunta" lì se è aperto o
+            // chiuso. Così cambiando scheda e tornando indietro un reparto
+            // chiuso resta chiuso. La chiave deve essere unica e stabile.
+            storageKey: PageStorageKey('${list.id}/$index/${section.name}'),
+            department: data.departmentFor(section),
+            section: section,
+          ),
+      ],
+    );
+  }
+}
+
+/// Un reparto: badge colorato, nome, "3/7"; tocchi l'intestazione e si chiude.
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({required this.storageKey, required this.department, required this.section});
+
+  final PageStorageKey<String> storageKey;
+  final ShoppingDepartment? department;
+  final ShoppingSection section;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final store = ShoppingScope.of(context);
+    final taken = section.items.where((i) => store.isChecked(i.id)).length;
+    final total = section.items.length;
+    final done = taken == total;
 
-    return ListView(
-      // In fondo più spazio: l'ultima riga non finisce sotto il tasto Reset.
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-      children: [
-        for (final section in list.sections) ...[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
-            child: Row(
-              children: [
-                Expanded(child: Text(section.name, style: theme.textTheme.titleLarge)),
-                // Quanti prodotti della sezione hai già preso: "3/7".
-                Text(
-                  '${section.items.where((i) => store.isChecked(i.id)).length}'
-                  '/${section.items.length}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ],
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        key: storageKey,
+        initiallyExpanded: true,
+        leading: DepartmentBadge(department: department),
+        title: Row(
+          children: [
+            Expanded(child: Text(department?.name ?? section.name, style: theme.textTheme.titleLarge)),
+            // Reparto finito: spunta e numero nel colore principale.
+            if (done) ...[
+              Icon(Icons.check_circle, size: 18, color: theme.colorScheme.primary),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              '$taken/$total',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: done ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
-          ),
-          Card(
-            child: Column(
-              children: withDividers(indent: 56, [
-                for (final item in section.items) _ShoppingItemTile(item: item),
-              ]),
-            ),
-          ),
-          const SizedBox(height: 16),
+          ],
+        ),
+        children: [
+          const Divider(),
+          ...withDividers(indent: 56, [
+            for (final item in section.items) _ShoppingItemTile(item: item),
+          ]),
         ],
-      ],
+      ),
     );
   }
 }
@@ -188,7 +232,9 @@ class _ShoppingItemTile extends StatelessWidget {
     final theme = Theme.of(context);
     final store = ShoppingScope.of(context);
     final checked = store.isChecked(item.id);
+    final secondary = theme.colorScheme.onSurfaceVariant;
     final quantity = item.quantity;
+    final note = item.note;
 
     // CheckboxListTile: una riga con checkbox già pronta. Toccare il testo
     // o la casella fa la stessa cosa (chiama onChanged).
@@ -203,10 +249,27 @@ class _ShoppingItemTile extends StatelessWidget {
         // vedi cosa manca ancora.
         style: TextStyle(
           decoration: checked ? TextDecoration.lineThrough : null,
-          color: checked ? theme.colorScheme.onSurfaceVariant : null,
+          color: checked ? secondary : null,
         ),
       ),
-      subtitle: quantity == null ? null : Text(quantity),
+      // La nota piccola sotto il nome; la quantità a destra, in colonna,
+      // così si legge "quanto" senza cercarlo nel testo.
+      subtitle: note == null ? null : Text(note, style: theme.textTheme.bodySmall?.copyWith(color: secondary)),
+      secondary: quantity == null
+          ? null
+          : ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 120),
+              child: Text(
+                quantity,
+                textAlign: TextAlign.end,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: checked ? secondary : null,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ),
     );
   }
 }
