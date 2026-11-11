@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:my_workout/data/body_weight_store.dart';
 import 'package:my_workout/data/profile_store.dart';
 import 'package:my_workout/features/weigh_in/widgets/weigh_in_banner.dart';
+import 'package:my_workout/features/weigh_in/widgets/weigh_in_day_dialog.dart';
 import 'package:my_workout/models/body_weight.dart';
 import 'package:my_workout/utils/formatters.dart';
 import 'package:my_workout/widgets/dividers.dart';
 import 'package:my_workout/widgets/weight_input_dialog.dart';
 import 'package:my_workout/widgets/main_app_bar.dart';
+import 'package:my_workout/widgets/page_title.dart';
 
 /// Tab "Pesata": il promemoria del giorno della pesata, lo storico delle pesate
 /// e il pulsante + per aggiungere quella di oggi.
@@ -38,10 +40,18 @@ class WeighInPage extends StatelessWidget {
         // In fondo più spazio: l'ultima riga non finisce sotto il pulsante +.
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
         children: [
+          // Il titolo col calendario: cambia il giorno della pesata.
+          PageTitle(
+            title: 'Pesata',
+            editTooltip: 'Giorno della pesata',
+            editIcon: Icons.edit_calendar_outlined,
+            onEdit: () => editWeighInDay(context),
+          ),
+          const SizedBox(height: 12),
           WeighInBanner(
             entries: entries,
             now: DateTime.now(),
-            // Il giorno scelto nell'onboarding (o dal profilo).
+            // Il giorno scelto nell'onboarding (o col calendario accanto al titolo).
             weekday: ProfileScope.of(context).weighInWeekday,
           ),
           const SizedBox(height: 24),

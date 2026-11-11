@@ -6,6 +6,7 @@ import 'package:my_workout/models/shopping.dart';
 import 'package:my_workout/widgets/dividers.dart';
 import 'package:my_workout/widgets/empty_state.dart';
 import 'package:my_workout/widgets/main_app_bar.dart';
+import 'package:my_workout/widgets/page_title.dart';
 
 /// Tab "Spesa": due schede (Settimanale, Mensile) con i prodotti da
 /// spuntare, e il tasto Reset sempre visibile in basso a destra.
@@ -63,10 +64,29 @@ class _ShoppingPageState extends State<ShoppingPage> {
       length: lists.length,
       child: Scaffold(
         appBar: MainAppBar(
-          bottom: TabBar(
-            tabs: [for (final list in lists) Tab(text: list.name)],
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            indicatorPadding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+          // Come nella Dieta: il titolo sopra le schede delle liste. Per ora
+          // senza pulsante di modifica (l'editor della spesa arriverà dopo).
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(56 + kTextTabBarHeight),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  // Alto 48 come il titolo della Dieta col suo pulsante:
+                  // così le due tab hanno l'header della stessa altezza.
+                  child: SizedBox(
+                    height: 48,
+                    child: Align(alignment: Alignment.centerLeft, child: PageTitle(title: 'Spesa')),
+                  ),
+                ),
+                TabBar(
+                  tabs: [for (final list in lists) Tab(text: list.name)],
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  indicatorPadding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+                ),
+              ],
+            ),
           ),
         ),
         // Builder: ci dà un `context` che sta DENTRO il DefaultTabController,

@@ -124,11 +124,16 @@ void main() {
     expect(find.text('InScheda'), findsOneWidget);
     expect(find.text('MR'), findsOneWidget);
 
-    // Tocco il cerchio: si apre il pannello dal basso, col nome.
-    await tester.tap(find.byTooltip('Profilo e impostazioni'));
+    // Nella tab Allenamento la matita per modificare la scheda.
+    expect(find.byTooltip('Modifica la scheda'), findsOneWidget);
+
+    // Tocco il cerchio: si apre il pannello dal basso, col nome e il
+    // backup (in arrivo). Scheda e dieta non si modificano più da qui.
+    await tester.tap(find.byTooltip('Profilo'));
     await tester.pumpAndSettle();
     expect(find.text('Mario Rossi'), findsOneWidget);
-    // Il download da GitHub non c'è più.
+    expect(find.text('Backup su Google Drive'), findsOneWidget);
+    expect(find.text('Modifica la scheda'), findsNothing);
     expect(find.text('Scarica gli ultimi dati'), findsNothing);
   });
 

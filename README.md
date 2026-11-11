@@ -57,6 +57,8 @@ Gli screenshot qui sopra li disegna l'app stessa, senza emulatore:
 flutter test tool/screenshots/readme_screenshots_test.dart
 ```
 
+Come si compilano gli APK e si pubblica una Release: [docs/RELEASE.md](docs/RELEASE.md).
+
 ### Struttura
 
 ```

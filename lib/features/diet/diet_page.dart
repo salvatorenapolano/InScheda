@@ -6,6 +6,7 @@ import 'package:my_workout/features/diet/widgets/diet_day_view.dart';
 import 'package:my_workout/models/diet.dart';
 import 'package:my_workout/widgets/empty_state.dart';
 import 'package:my_workout/widgets/main_app_bar.dart';
+import 'package:my_workout/widgets/page_title.dart';
 
 /// Tab "Dieta": la settimana tipo, un giorno per scheda (Lun … Dom).
 class DietPage extends StatefulWidget {
@@ -70,14 +71,35 @@ class _DietPageState extends State<DietPage> {
       initialIndex: today,
       child: Scaffold(
         appBar: MainAppBar(
-          bottom: TabBar(
-            tabs: [for (final day in diet.days) Tab(text: day.shortName)],
-            labelPadding: EdgeInsets.zero,
-            // padding: spazio attorno a tutta la fila di schede.
-            // indicatorPadding: rimpicciolisce la "pillola" del giorno scelto
-            // rispetto alla sua scheda, così non tocca le vicine.
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            indicatorPadding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+          // Sotto il logo: il titolo "Dieta" con la matita e, sotto ancora,
+          // la fila dei giorni. PreferredSize perché l'AppBar vuole sapere
+          // quanto è alto quello che le mettiamo sotto.
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(56 + kTextTabBarHeight),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: PageTitle(
+                    title: 'Dieta',
+                    editTooltip: 'Modifica la dieta',
+                    onEdit: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(builder: (_) => const DietEditorPage()),
+                    ),
+                  ),
+                ),
+                TabBar(
+                  tabs: [for (final day in diet.days) Tab(text: day.shortName)],
+                  labelPadding: EdgeInsets.zero,
+                  // padding: spazio attorno a tutta la fila di schede.
+                  // indicatorPadding: rimpicciolisce la "pillola" del giorno scelto
+                  // rispetto alla sua scheda, così non tocca le vicine.
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  indicatorPadding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+                ),
+              ],
+            ),
           ),
         ),
         body: TabBarView(

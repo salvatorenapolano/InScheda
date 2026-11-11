@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:my_workout/data/workout_repository.dart';
+import 'package:my_workout/features/plan_editor/plan_editor_page.dart';
 import 'package:my_workout/features/workout/widgets/exercise_block_tile.dart';
 import 'package:my_workout/features/workout/widgets/planned_exercise_tile.dart';
 import 'package:my_workout/features/workout/widgets/step_number.dart';
@@ -10,6 +11,7 @@ import 'package:my_workout/models/workout_plan.dart';
 import 'package:my_workout/widgets/dividers.dart';
 import 'package:my_workout/widgets/empty_state.dart';
 import 'package:my_workout/widgets/main_app_bar.dart';
+import 'package:my_workout/widgets/page_title.dart';
 
 /// Tab "Allenamento": cosa tocca oggi, scelta del giorno (Push/Pull/Legs)
 /// e i blocchi della seduta.
@@ -58,16 +60,22 @@ class _WorkoutPageState extends State<WorkoutPage> {
           // La libreria c'è sempre, la scheda no (primo avvio).
           final plan = data.plan;
           if (plan == null) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.fitness_center,
               title: 'Nessuna scheda',
               message: 'Qui vedrai i tuoi allenamenti, giorno per giorno, con gli esercizi e i pesi che usi.',
+              actionLabel: 'Crea la scheda',
+              onAction: () => _openEditor(context),
             );
           }
           return _buildContent(data, plan);
         },
       ),
     );
+  }
+
+  void _openEditor(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const PlanEditorPage()));
   }
 
   Widget _buildContent(WorkoutData data, WorkoutPlan plan) {
@@ -92,6 +100,14 @@ class _WorkoutPageState extends State<WorkoutPage> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
       children: [
+        // Il titolo con la matita: apre l'editor della scheda (lo stesso
+        // dell'onboarding).
+        PageTitle(
+          title: 'Allenamento',
+          editTooltip: 'Modifica la scheda',
+          onEdit: () => _openEditor(context),
+        ),
+        const SizedBox(height: 12),
         TodayBanner(plan: plan, now: now),
         const SizedBox(height: 16),
 

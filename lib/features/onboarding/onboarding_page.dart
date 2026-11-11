@@ -454,27 +454,53 @@ class _ReadyStep extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
-        // Il "da sapere": dove si cambia tutto, col cerchio del profilo
-        // disegnato accanto, così lo riconosci subito in alto a destra.
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                ProfileAvatar(size: 40, initials: initialsOf(name), settingsBadge: true),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    'Scheda, dieta e giorno della pesata li cambi quando vuoi '
-                    "toccando il cerchio del profilo con l'ingranaggio, in alto a destra.",
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ),
-              ],
-            ),
+        // I due "da sapere", ognuno con disegnato accanto quello che
+        // troverai nell'app, così lo riconosci subito.
+        // 1. La matita accanto ai titoli delle tab.
+        _TipCard(
+          leading: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+            child: Icon(Icons.edit_outlined, color: colors.onPrimaryContainer),
           ),
+          text: 'Scheda, dieta e giorno della pesata li cambi quando vuoi '
+              'con la matita accanto al titolo della loro schermata.',
+        ),
+        const SizedBox(height: 8),
+        // 2. Il cerchio del profilo in alto a destra, con le sue iniziali.
+        _TipCard(
+          leading: ProfileAvatar(size: 40, initials: initialsOf(name)),
+          text: 'Tocca il cerchio con le tue iniziali, in alto a destra, per '
+              'modificare il profilo. Presto da lì potrai anche salvare i tuoi '
+              'dati su Google Drive e recuperarli.',
         ),
       ],
+    );
+  }
+}
+
+/// Una card "da sapere" della pagina finale: un'immagine a sinistra
+/// (la matita, il cerchio del profilo) e una frase accanto.
+class _TipCard extends StatelessWidget {
+  const _TipCard({required this.leading, required this.text});
+
+  final Widget leading;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            leading,
+            const SizedBox(width: 16),
+            Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
+          ],
+        ),
+      ),
     );
   }
 }

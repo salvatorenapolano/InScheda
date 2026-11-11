@@ -125,9 +125,8 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Profilo e impostazioni'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Modifica la scheda'));
+    // La matita in alto, nella tab Allenamento.
+    await tester.tap(find.byTooltip('Modifica la scheda'));
     await tester.pumpAndSettle();
 
     // L'editor parte dalla scheda attuale.
@@ -215,9 +214,8 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Profilo e impostazioni'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Modifica la scheda'));
+    // La matita in alto, nella tab Allenamento.
+    await tester.tap(find.byTooltip('Modifica la scheda'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Push'));
     await tester.pumpAndSettle();
@@ -260,9 +258,8 @@ void main() {
       assets: FixtureBundle(),
     ));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Profilo e impostazioni'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Modifica la scheda'));
+    // La matita in alto, nella tab Allenamento.
+    await tester.tap(find.byTooltip('Modifica la scheda'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Push'));
     await tester.pumpAndSettle();

@@ -7,6 +7,9 @@ import 'package:my_workout/features/profile/profile_sheet.dart';
 /// L'header di tutte le tab: il logo "InScheda" a sinistra, il cerchio del
 /// profilo a destra. [bottom] serve alle pagine con le schede (Dieta, Spesa).
 ///
+/// I pulsanti per modificare i dati NON stanno qui (l'header è uguale per
+/// tutte le tab): ogni tab li ha accanto al suo titolo (vedi PageTitle).
+///
 /// Uno Scaffold accetta come appBar solo un PreferredSizeWidget: un widget
 /// che sa dire quanto vuole essere alto (preferredSize).
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -37,10 +40,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         IconButton(
-          // L'ingranaggio sul cerchio fa capire che da qui si cambiano i dati.
-          tooltip: 'Profilo e impostazioni',
+          tooltip: 'Profilo',
           onPressed: () => showProfileSheet(context),
-          icon: const ProfileAvatar(settingsBadge: true),
+          icon: const ProfileAvatar(),
         ),
         const SizedBox(width: 8),
       ],

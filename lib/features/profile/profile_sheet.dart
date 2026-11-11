@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:my_workout/data/profile_store.dart';
-import 'package:my_workout/features/diet_editor/diet_editor_page.dart';
-import 'package:my_workout/features/plan_editor/plan_editor_page.dart';
 import 'package:my_workout/features/profile/profile_avatar.dart';
-import 'package:my_workout/features/weigh_in/widgets/weigh_in_day_picker.dart';
 
 /// Apre il pannello del profilo dal basso.
 Future<void> showProfileSheet(BuildContext context) {
@@ -19,8 +16,11 @@ Future<void> showProfileSheet(BuildContext context) {
   );
 }
 
-/// Il pannello del profilo: avatar e nome (con la matita per cambiarlo)
-/// e i pulsanti per modificare la scheda, la dieta e il giorno della pesata.
+/// Il pannello del profilo: avatar e nome (con la matita per cambiarlo) e
+/// il backup dei dati, che arriverà più avanti.
+///
+/// Scheda, dieta e giorno della pesata NON si cambiano da qui: ognuno ha la
+/// sua matita in alto, nella sua tab, vicino ai dati che modifica.
 class ProfileSheet extends StatelessWidget {
   const ProfileSheet({super.key});
 
@@ -31,27 +31,6 @@ class ProfileSheet extends StatelessWidget {
     );
     // null = l'utente ha premuto Annulla.
     if (name != null) await profile.setName(name);
-  }
-
-  Future<void> _editWeighInDay(
-    BuildContext context,
-    ProfileStore profile,
-  ) async {
-    final day = await showDialog<int>(
-      context: context,
-      builder: (context) =>
-          _WeighInDayDialog(initialDay: profile.weighInWeekday),
-    );
-    if (day != null) await profile.setWeighInWeekday(day);
-  }
-
-  /// Chiude il pannello e apre [page] (un editor) sopra le tab. Il
-  /// navigator lo prendiamo prima: dopo pop() il pannello (e il suo
-  /// context) non c'è più.
-  void _open(BuildContext context, Widget page) {
-    final navigator = Navigator.of(context);
-    navigator.pop();
-    navigator.push(MaterialPageRoute<void>(builder: (_) => page));
   }
 
   @override
@@ -89,22 +68,20 @@ class ProfileSheet extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
+            // Il backup su Google Drive arriverà in una prossima versione:
+            // il pulsante c'è già, spento, con la spiegazione sotto.
+            // onPressed null = pulsante spento.
             FilledButton.tonalIcon(
-              onPressed: () => _open(context, const PlanEditorPage()),
-              icon: const Icon(Icons.fitness_center),
-              label: const Text('Modifica la scheda'),
+              onPressed: null,
+              icon: const Icon(Icons.cloud_upload_outlined),
+              label: const Text('Backup su Google Drive'),
             ),
-            const SizedBox(height: 8),
-            FilledButton.tonalIcon(
-              onPressed: () => _open(context, const DietEditorPage()),
-              icon: const Icon(Icons.restaurant_menu),
-              label: const Text('Modifica la dieta'),
-            ),
-            const SizedBox(height: 8),
-            FilledButton.tonalIcon(
-              onPressed: () => _editWeighInDay(context, profile),
-              icon: const Icon(Icons.monitor_weight_outlined),
-              label: Text('Modifica giorno pesata'),
+            const SizedBox(height: 6),
+            Text(
+              'In arrivo: salverai scheda, dieta e pesate nel tuo Drive, '
+              'per ritrovarle se cambi telefono.',
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -115,41 +92,6 @@ class ProfileSheet extends StatelessWidget {
 
 /// Il dialog per cambiare nome. È uno StatefulWidget perché possiede un
 /// TextEditingController, che va creato una volta e liberato in dispose().
-/// Il dialog per il giorno della pesata: i 7 giorni, se ne sceglie uno.
-class _WeighInDayDialog extends StatefulWidget {
-  const _WeighInDayDialog({required this.initialDay});
-
-  final int initialDay;
-
-  @override
-  State<_WeighInDayDialog> createState() => _WeighInDayDialogState();
-}
-
-class _WeighInDayDialogState extends State<_WeighInDayDialog> {
-  late int _day = widget.initialDay;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Giorno della pesata'),
-      content: WeighInDayPicker(
-        value: _day,
-        onChanged: (day) => setState(() => _day = day),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annulla'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(_day),
-          child: const Text('Salva'),
-        ),
-      ],
-    );
-  }
-}
-
 class _NameDialog extends StatefulWidget {
   const _NameDialog({required this.initialName});
 

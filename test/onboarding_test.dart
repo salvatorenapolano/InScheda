@@ -176,7 +176,8 @@ void main() {
       expect(find.text('Tutto pronto, Mario!'), findsOneWidget);
       expect(find.text('1 scheda · lun · gio'), findsOneWidget);
       expect(find.text('Pesata ogni domenica'), findsOneWidget);
-      expect(find.textContaining('toccando il cerchio del profilo'), findsOneWidget);
+      expect(find.textContaining('con la matita accanto al titolo'), findsOneWidget);
+      expect(find.textContaining('Google Drive'), findsOneWidget);
 
       // "Entra" salva la scheda su file: serve tempo vero (vedi pumpUntil).
       await tester.tap(find.text('Entra'));
@@ -208,7 +209,7 @@ void main() {
       await profile.completeOnboarding(name: 'Mario Rossi');
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Profilo e impostazioni'));
+      await tester.tap(find.byTooltip('Profilo'));
       await tester.pumpAndSettle();
       expect(find.text('Mario Rossi'), findsOneWidget);
 
@@ -224,15 +225,16 @@ void main() {
       expect(find.text('LB'), findsNWidgets(2));
     });
 
-    testWidgets('dal profilo si cambia il giorno della pesata', (tester) async {
+    testWidgets('dalla tab Pesata si cambia il giorno della pesata', (tester) async {
       final profile = await pumpApp(tester);
       await profile.completeOnboarding(name: 'Mario Rossi');
       await tester.pumpAndSettle();
       expect(profile.weighInWeekday, DateTime.friday);
 
-      await tester.tap(find.byTooltip('Profilo e impostazioni'));
+      // Il calendario in alto, nella tab Pesata.
+      await tester.tap(find.text('Pesata'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Modifica giorno pesata'));
+      await tester.tap(find.byTooltip('Giorno della pesata'));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(ChoiceChip, 'Lun'));
       await tester.pump();
