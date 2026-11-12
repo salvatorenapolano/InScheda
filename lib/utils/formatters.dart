@@ -98,3 +98,38 @@ String formatWeightChange(double diff) {
   // "−" è il vero segno meno tipografico, più largo del trattino "-".
   return '${rounded > 0 ? '+' : '−'}${formatNumber(rounded.abs())}';
 }
+
+/// Il cronometro: 75 s → "1:15", 3725 s → "1:02:05".
+/// padLeft(2, '0') aggiunge lo zero davanti: 5 → "05".
+String formatClock(Duration duration) {
+  final hours = duration.inHours;
+  final minutes = duration.inMinutes % 60;
+  final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+  if (hours == 0) return '$minutes:$seconds';
+  return '$hours:${minutes.toString().padLeft(2, '0')}:$seconds';
+}
+
+/// Una durata da leggere: 42 min → "42 min", 65 min → "1 h 05 min".
+String formatDurationShort(Duration duration) {
+  final hours = duration.inHours;
+  final minutes = duration.inMinutes % 60;
+  if (hours == 0) return '$minutes min';
+  return '$hours h ${minutes.toString().padLeft(2, '0')} min';
+}
+
+/// Le kcal arrotondate, con la tilde perché sono una stima: "~245 kcal".
+String formatKcal(double kcal) => '~${kcal.round()} kcal';
+
+/// "11 nov" per le date brevi dello storico.
+String formatShortDate(DateTime date) => '${date.day} ${_months[date.month - 1].substring(0, 3)}';
+
+/// La lettera di una scheda per i bollini: "Scheda A" → "A", "Push" → "P",
+/// "Scheda 2" → "2". Se l'ultima parola è corta (1-2 caratteri) è quella
+/// la "lettera"; altrimenti l'iniziale del nome.
+String workoutInitial(String name) {
+  final words = name.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+  if (words.isEmpty) return '?';
+  final last = words.last;
+  if (words.length > 1 && last.length <= 2) return last.toUpperCase();
+  return words.first[0].toUpperCase();
+}

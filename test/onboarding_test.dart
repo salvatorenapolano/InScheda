@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:my_workout/app.dart';
 import 'package:my_workout/data/body_weight_store.dart';
+import 'package:my_workout/data/focus_alerts.dart';
+import 'package:my_workout/data/focus_store.dart';
 import 'package:my_workout/data/profile_store.dart';
 import 'package:my_workout/data/shopping_store.dart';
 import 'package:my_workout/data/user_data_store.dart';
@@ -34,6 +36,18 @@ void main() {
       final profile = await ProfileStore.load();
       expect(profile.name, '');
       expect(profile.onboardingDone, isFalse);
+      // Di default la vista guidata, con video e consigli.
+      expect(profile.essentialView, isFalse);
+    });
+
+    test('la vista essenziale si salva e resta dopo il riavvio', () async {
+      SharedPreferences.setMockInitialValues({});
+      final profile = await ProfileStore.load();
+      await profile.completeOnboarding(name: 'Mario', essentialView: true);
+      expect(profile.essentialView, isTrue);
+
+      await profile.setEssentialView(false);
+      expect((await ProfileStore.load()).essentialView, isFalse);
     });
 
     test('completeOnboarding salva il nome e avvisa', () async {
@@ -71,6 +85,7 @@ void main() {
         shopping: await ShoppingStore.load(),
         profile: profile,
         userData: userData,
+        focus: await FocusStore.load(alerts: SilentFocusAlerts()),
       ));
       await tester.pumpAndSettle();
       return profile;
@@ -169,6 +184,14 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Avanti'));
       await tester.pumpAndSettle();
 
+      // La vista degli esercizi: guidata già scelta, passo all'essenziale.
+      expect(find.text('Come vuoi vedere gli esercizi?'), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      await tester.tap(find.text('Essenziale'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Avanti'));
+      await tester.pumpAndSettle();
+
       // La pesata: venerdì già scelto, la cambio in domenica.
       expect(find.text('Quando ti pesi?'), findsOneWidget);
       expect(tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Ven')).selected, isTrue);
@@ -186,7 +209,12 @@ void main() {
 
       // "Entra" salva la scheda su file: serve tempo vero (vedi pumpUntil).
       await tester.tap(find.text('Entra'));
+      // Prima delle tab, una volta sola, il tutorial della modalità Focus.
+      await pumpUntil(tester, () => find.text('Modalità Focus').evaluate().isNotEmpty);
+      expect(profile.focusTutorialPending, isTrue);
+      await tester.tap(find.text('Salta'));
       await pumpUntil(tester, () => find.text('Chest press').evaluate().isNotEmpty);
+      expect(profile.focusTutorialPending, isFalse);
 
       // Onboarding finito: le tab, il profilo e la scheda sono salvati.
       expect(find.byType(OnboardingPage), findsNothing);
@@ -195,6 +223,7 @@ void main() {
       expect(profile.onboardingDone, isTrue);
       expect(profile.name, 'Mario Rossi');
       expect(profile.weighInWeekday, DateTime.sunday);
+      expect(profile.essentialView, isTrue);
       expect(userData.hasPlan, isTrue);
     });
 
@@ -212,6 +241,8 @@ void main() {
     testWidgets('dal profilo si cambia il nome', (tester) async {
       final profile = await pumpApp(tester);
       await profile.completeOnboarding(name: 'Mario Rossi');
+      // Il tutorial del Focus lo prova il test qui sopra: qui lo saltiamo.
+      await profile.markFocusTutorialSeen();
       await tester.pumpAndSettle();
 
       await tester.tap(find.byTooltip('Profilo'));
@@ -233,6 +264,8 @@ void main() {
     testWidgets('dalla tab Pesata si cambia il giorno della pesata', (tester) async {
       final profile = await pumpApp(tester);
       await profile.completeOnboarding(name: 'Mario Rossi');
+      // Il tutorial del Focus lo prova il test qui sopra: qui lo saltiamo.
+      await profile.markFocusTutorialSeen();
       await tester.pumpAndSettle();
       expect(profile.weighInWeekday, DateTime.friday);
 
@@ -252,6 +285,8 @@ void main() {
     testWidgets("finito l'onboarding le tab sono vuote: niente dati di altri", (tester) async {
       final profile = await pumpApp(tester);
       await profile.completeOnboarding(name: 'Mario Rossi');
+      // Il tutorial del Focus lo prova il test qui sopra: qui lo saltiamo.
+      await profile.markFocusTutorialSeen();
       await tester.pumpAndSettle();
 
       expect(find.text('Nessuna scheda'), findsOneWidget);

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:my_workout/app_theme.dart';
+import 'package:my_workout/data/focus_store.dart';
 import 'package:my_workout/data/workout_repository.dart';
+import 'package:my_workout/features/focus/focus_actions.dart';
 import 'package:my_workout/features/plan_editor/plan_editor_page.dart';
 import 'package:my_workout/features/workout/widgets/exercise_block_tile.dart';
 import 'package:my_workout/features/workout/widgets/planned_exercise_tile.dart';
@@ -74,6 +77,17 @@ class _WorkoutPageState extends State<WorkoutPage> {
     );
   }
 
+  /// "Inizia allenamento": avvia il Focus e mostra quella scheda.
+  Future<void> _start(Workout workout, WorkoutPlan plan) async {
+    await startFocus(
+      context,
+      workout: workout,
+      planCardio: plan.cardio,
+      colorIndex: plan.indexOfWorkout(workout.id),
+    );
+    if (mounted) setState(() => _selectedWorkoutId = workout.id);
+  }
+
   void _openEditor(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const PlanEditorPage()));
   }
@@ -108,7 +122,11 @@ class _WorkoutPageState extends State<WorkoutPage> {
           onEdit: () => _openEditor(context),
         ),
         const SizedBox(height: 12),
-        TodayBanner(plan: plan, now: now),
+        // Durante il Focus il banner mostra l'allenamento in corso.
+        if (FocusModeScope.of(context).isActive)
+          const FocusBanner()
+        else
+          TodayBanner(plan: plan, now: now, onStart: (workout) => _start(workout, plan)),
         const SizedBox(height: 16),
 
         SegmentedButton<String>(
@@ -127,6 +145,19 @@ class _WorkoutPageState extends State<WorkoutPage> {
               ),
           ],
           selected: {workout.id},
+          // Il segmento scelto col colore della scheda, testo bianco.
+          // WidgetStateProperty: un valore diverso a seconda dello stato
+          // (scelto, premuto, disattivato...).
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.resolveWith(
+              (states) => states.contains(WidgetState.selected)
+                  ? workoutColor(plan.indexOfWorkout(workout.id))
+                  : null,
+            ),
+            foregroundColor: WidgetStateProperty.resolveWith(
+              (states) => states.contains(WidgetState.selected) ? Colors.white : null,
+            ),
+          ),
           onSelectionChanged: (selection) {
             setState(() => _selectedWorkoutId = selection.first);
           },

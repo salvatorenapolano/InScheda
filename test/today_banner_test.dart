@@ -5,8 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'helpers/fixtures.dart';
 
+import 'package:my_workout/app_theme.dart';
 import 'package:my_workout/data/workout_repository.dart';
 import 'package:my_workout/features/workout/widgets/today_banner.dart';
+import 'package:my_workout/widgets/status_banner.dart';
 
 void main() {
   final plan = WorkoutRepository.parse(
@@ -32,6 +34,17 @@ void main() {
     expect(find.text('Oggi: Pull'), findsOneWidget);
     await pumpBanner(tester, DateTime(2026, 12, 4));
     expect(find.text('Oggi: Legs'), findsOneWidget);
+  });
+
+  testWidgets('il banner prende il colore della scheda di oggi', (tester) async {
+    StatusBanner banner() => tester.widget<StatusBanner>(find.byType(StatusBanner));
+    await pumpBanner(tester, DateTime(2026, 11, 16)); // Push, la prima
+    expect(banner().color, workoutColor(0));
+    await pumpBanner(tester, DateTime(2026, 11, 18)); // Pull, la seconda
+    expect(banner().color, workoutColor(1));
+    // Nei giorni di riposo il banner resta neutro.
+    await pumpBanner(tester, DateTime(2026, 11, 15));
+    expect(banner().color, isNull);
   });
 
   testWidgets('giorno di riposo: dice quando è il prossimo', (tester) async {

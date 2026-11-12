@@ -16,7 +16,9 @@ class StatusBanner extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.highlighted = false,
+    this.color,
     this.watermark,
+    this.action,
   });
 
   final IconData icon;
@@ -27,10 +29,17 @@ class StatusBanner extends StatelessWidget {
 
   final bool highlighted;
 
+  /// Il colore del banner quando è [highlighted] (il colore della scheda).
+  /// null = il colore principale dell'app.
+  final Color? color;
+
   /// Elemento decorativo gigante e semitrasparente in basso a destra
   /// (la lettera della scheda, l'icona della bilancia...). Prende da solo
   /// il colore giusto: qui lo "avvolgiamo" con IconTheme e DefaultTextStyle.
   final Widget? watermark;
+
+  /// Un pulsante a destra del testo ("Inizia allenamento"). null = nessuno.
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +50,11 @@ class StatusBanner extends StatelessWidget {
     // In tema scuro il "primary" è una versione chiara del seme: per avere
     // un colore pieno e scuro usiamo primaryContainer (e il suo testo).
     final dark = theme.brightness == Brightness.dark;
-    final highlightBackground = dark ? colors.primaryContainer : colors.primary;
-    final onHighlight = dark ? colors.onPrimaryContainer : colors.onPrimary;
+    // Col colore della scheda il testo è sempre bianco: la tavolozza è scura
+    // apposta, in chiaro e in scuro.
+    final color = this.color;
+    final highlightBackground = color ?? (dark ? colors.primaryContainer : colors.primary);
+    final onHighlight = color != null ? Colors.white : (dark ? colors.onPrimaryContainer : colors.onPrimary);
 
     final background = highlighted ? highlightBackground : theme.cardTheme.color ?? colors.surface;
     final foreground = highlighted ? onHighlight : colors.onSurface;
@@ -79,17 +91,30 @@ class StatusBanner extends StatelessWidget {
               ),
             ),
           Padding(
-            // A destra lasciamo spazio al watermark, così il testo non ci finisce sopra.
-            padding: EdgeInsets.fromLTRB(20, 20, watermark != null ? 96 : 20, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // A destra lasciamo spazio al watermark, così il testo non ci
+            // finisce sopra. Col pulsante no: lo spazio a destra è suo.
+            padding: EdgeInsets.fromLTRB(20, 20, watermark != null && action == null ? 96 : 20, 20),
+            // Row: il testo a sinistra (Expanded prende tutto lo spazio che
+            // avanza) e il pulsante a destra, centrato in altezza.
+            child: Row(
               children: [
-                Icon(icon, color: highlighted ? foreground : colors.primary),
-                const SizedBox(height: 12),
-                Text(title, style: textTheme.headlineSmall?.copyWith(color: foreground)),
-                if (subtitle != null) ...[
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: textTheme.bodyMedium?.copyWith(color: secondary)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(icon, color: highlighted ? foreground : colors.primary),
+                      const SizedBox(height: 12),
+                      Text(title, style: textTheme.headlineSmall?.copyWith(color: foreground)),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(subtitle, style: textTheme.bodyMedium?.copyWith(color: secondary)),
+                      ],
+                    ],
+                  ),
+                ),
+                if (action case final action?) ...[
+                  const SizedBox(width: 12),
+                  action,
                 ],
               ],
             ),

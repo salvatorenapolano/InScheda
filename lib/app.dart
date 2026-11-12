@@ -4,10 +4,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:my_workout/app_theme.dart';
 import 'package:my_workout/data/body_weight_store.dart';
+import 'package:my_workout/data/focus_store.dart';
 import 'package:my_workout/data/profile_store.dart';
 import 'package:my_workout/data/shopping_store.dart';
 import 'package:my_workout/data/user_data_store.dart';
 import 'package:my_workout/data/weight_store.dart';
+import 'package:my_workout/features/focus/focus_tutorial_page.dart';
+import 'package:my_workout/features/focus/widgets/focus_widgets.dart';
 import 'package:my_workout/features/onboarding/onboarding_page.dart';
 import 'package:my_workout/home_shell.dart';
 
@@ -23,6 +26,7 @@ class MyWorkoutApp extends StatelessWidget {
     required this.shopping,
     required this.profile,
     required this.userData,
+    required this.focus,
     this.assets,
   });
 
@@ -42,6 +46,9 @@ class MyWorkoutApp extends StatelessWidget {
   /// La scheda e la dieta create dall'utente: vincono sugli asset.
   final UserDataStore userData;
 
+  /// La modalità Focus: l'allenamento in corso e lo storico.
+  final FocusStore focus;
+
   /// Il piano più basso dei dati: i file dentro l'app (rootBundle).
   /// I test ci mettono un bundle coi loro dati di prova.
   final AssetBundle? assets;
@@ -59,13 +66,16 @@ class MyWorkoutApp extends StatelessWidget {
             store: bodyWeights,
             child: ShoppingScope(
               store: shopping,
-              // ListenableBuilder ridisegna l'app quando il ProfileStore
-              // (onboarding finito) o lo UserDataStore (scheda o dieta
-              // salvate) chiamano notifyListeners(). Listenable.merge li
-              // ascolta tutti e due insieme.
-              child: ListenableBuilder(
-                listenable: Listenable.merge([profile, userData]),
-                builder: (context, _) => _buildApp(),
+              child: FocusModeScope(
+                store: focus,
+                // ListenableBuilder ridisegna l'app quando il ProfileStore
+                // (onboarding finito) o lo UserDataStore (scheda o dieta
+                // salvate) chiamano notifyListeners(). Listenable.merge li
+                // ascolta tutti e due insieme.
+                child: ListenableBuilder(
+                  listenable: Listenable.merge([profile, userData]),
+                  builder: (context, _) => _buildApp(),
+                ),
               ),
             ),
           ),
@@ -91,16 +101,22 @@ class MyWorkoutApp extends StatelessWidget {
       // DefaultAssetBundle: da qui in giù Image.asset, SvgPicture.asset e i
       // repository leggono i file dal bundle dei dati: prima quelli
       // dell'utente, poi quelli dell'app.
+      //
+      // FocusGlow sta sopra a tutte le pagine (anche ai dialog): durante il
+      // Focus disegna il bagliore arancione ai bordi dello schermo.
       builder: (context, child) => DefaultAssetBundle(
         bundle: userData.bundleOver(assets ?? rootBundle),
-        child: child!,
+        child: FocusGlow(child: child!),
       ),
       // La Key cambia quando cambiano i dati: Flutter butta via le pagine
       // vecchie e ne crea di nuove, che rileggono scheda, dieta e spesa.
-      // Al primo avvio l'onboarding, poi sempre le tab.
-      home: profile.onboardingDone
-          ? HomeShell(key: ValueKey(userData.revision))
-          : const OnboardingPage(),
+      // Al primo avvio l'onboarding, poi (una volta) il tutorial del Focus,
+      // poi sempre le tab.
+      home: switch ((profile.onboardingDone, profile.focusTutorialPending)) {
+        (false, _) => const OnboardingPage(),
+        (true, true) => FocusTutorialPage(onDone: profile.markFocusTutorialSeen),
+        (true, false) => HomeShell(key: ValueKey(userData.revision)),
+      },
     );
   }
 }

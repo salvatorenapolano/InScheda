@@ -23,6 +23,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_workout/app.dart';
 import 'package:my_workout/app_theme.dart';
 import 'package:my_workout/data/body_weight_store.dart';
+import 'package:my_workout/data/focus_alerts.dart';
+import 'package:my_workout/data/focus_store.dart';
 import 'package:my_workout/data/profile_store.dart';
 import 'package:my_workout/data/shopping_store.dart';
 import 'package:my_workout/data/user_data_store.dart';
@@ -162,6 +164,7 @@ Future<MyWorkoutApp> _app({required bool onboardingDone}) async {
     bodyWeights: await BodyWeightStore.load(),
     shopping: await ShoppingStore.load(),
     profile: await ProfileStore.load(),
+    focus: await FocusStore.load(alerts: SilentFocusAlerts()),
     userData: UserDataStore(root: Directory.systemTemp.createTempSync('screenshots')),
     assets: _ShowcaseBundle(),
   );

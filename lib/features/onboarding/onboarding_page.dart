@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:my_workout/app_theme.dart';
 import 'package:my_workout/data/profile_store.dart';
 import 'package:my_workout/data/user_data_store.dart';
 import 'package:my_workout/data/workout_repository.dart';
@@ -16,7 +17,7 @@ import 'package:my_workout/utils/formatters.dart';
 
 /// Le pagine del primo avvio:
 /// benvenuto → nome → hai già una scheda? → giorni → schede ed esercizi →
-/// pesata → tutto pronto.
+/// come vuoi vedere gli esercizi? → pesata → tutto pronto.
 ///
 /// "Hai già una scheda?" può aprire l'import con l'IA: la scheda importata
 /// riempie la bozza, e le pagine dei giorni e delle schede la mostrano già
@@ -58,7 +59,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
   // Il giorno della pesata: venerdì finché l'utente non ne sceglie un altro.
   int _weighInDay = defaultWeighInWeekday;
 
-  static const _pageCount = 7;
+  // La vista degli esercizi: guidata (false) finché l'utente non sceglie
+  // quella essenziale. Si cambia poi dalla modifica della scheda.
+  bool _essentialView = false;
+
+  static const _pageCount = 8;
 
   // Controller e simili vanno liberati quando la pagina sparisce,
   // altrimenti restano in memoria ad ascoltare per sempre.
@@ -104,7 +109,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
     // notifyListeners(), MyWorkoutApp si ridisegna e al posto di questa
     // pagina mostra le tab (con la scheda già salvata). Non serve Navigator.
     await userData.savePlan(_draft.toPlan(today: DateTime.now()));
-    await profile.completeOnboarding(name: _nameController.text, weighInWeekday: _weighInDay);
+    await profile.completeOnboarding(
+      name: _nameController.text,
+      weighInWeekday: _weighInDay,
+      essentialView: _essentialView,
+    );
   }
 
   @override
@@ -131,10 +140,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   _SourceStep(onScratch: () => _goTo(3), onImport: _import),
                   _DaysStep(draft: _draft, onNext: () => _goTo(4)),
                   _WorkoutsStep(draft: _draft, library: _library, onNext: () => _goTo(5)),
+                  _ViewStep(
+                    essential: _essentialView,
+                    onChanged: (essential) => setState(() => _essentialView = essential),
+                    onNext: () => _goTo(6),
+                  ),
                   _WeighInStep(
                     day: _weighInDay,
                     onChanged: (day) => setState(() => _weighInDay = day),
-                    onNext: () => _goTo(6),
+                    onNext: () => _goTo(7),
                   ),
                   // Listenable.merge: si ridisegna quando cambia il nome o la
                   // scheda, così il riepilogo è sempre quello giusto.
@@ -478,6 +492,135 @@ class _ChoiceCard extends StatelessWidget {
               ),
               Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Come vuoi vedere gli esercizi?": guidata (con video e consigli) o
+/// essenziale (solo i numeri che servono in palestra).
+///
+/// Le due card funzionano come dei "radio button": una sola è scelta.
+/// Il valore lo tiene la pagina dell'onboarding, qui lo mostriamo soltanto
+/// e comunichiamo il cambio con [onChanged] (lo stato "sta sopra").
+class _ViewStep extends StatelessWidget {
+  const _ViewStep({required this.essential, required this.onChanged, required this.onNext});
+
+  final bool essential;
+  final ValueChanged<bool> onChanged;
+  final VoidCallback onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return _StepLayout(
+      button: FilledButton(onPressed: onNext, child: const Text('Avanti')),
+      children: [
+        const SizedBox(height: 32),
+        Center(
+          child: Container(
+            width: 96,
+            height: 96,
+            decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+            child: Icon(Icons.visibility_outlined, size: 48, color: colors.onPrimaryContainer),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Text('Come vuoi vedere gli esercizi?', style: theme.textTheme.headlineMedium, textAlign: TextAlign.center),
+        const SizedBox(height: 8),
+        Text(
+          'Puoi cambiarlo quando vuoi, dalla modifica della scheda.',
+          style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 24),
+        _SelectableCard(
+          icon: Icons.play_circle_outline,
+          title: 'Guidata',
+          text: 'Video, come si esegue e consigli. Ideale se sei agli inizi.',
+          selected: !essential,
+          onTap: () => onChanged(false),
+        ),
+        const SizedBox(height: 12),
+        _SelectableCard(
+          icon: Icons.bolt_outlined,
+          title: 'Essenziale',
+          text: 'Solo serie, ripetizioni, peso e muscoli. Per chi conosce già gli esercizi.',
+          selected: essential,
+          onTap: () => onChanged(true),
+        ),
+      ],
+    );
+  }
+}
+
+/// Una card da scegliere fra più: bordo colorato e spunta se è quella scelta.
+class _SelectableCard extends StatelessWidget {
+  const _SelectableCard({
+    required this.icon,
+    required this.title,
+    required this.text,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String text;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    // Semantics: TalkBack/VoiceOver dicono "selezionato" sulla card scelta,
+    // come farebbero con un vero radio button.
+    return Semantics(
+      selected: selected,
+      inMutuallyExclusiveGroup: true,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        // La forma della card con, se scelta, il bordo del colore primario.
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+          side: BorderSide(color: selected ? colors.primary : Colors.transparent, width: 2),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(color: colors.primaryContainer, borderRadius: BorderRadius.circular(12)),
+                  child: Icon(icon, color: colors.onPrimaryContainer),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: theme.textTheme.titleMedium),
+                      const SizedBox(height: 2),
+                      Text(text, style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  selected ? Icons.check_circle : Icons.radio_button_unchecked,
+                  color: selected ? colors.primary : colors.onSurfaceVariant,
+                ),
+              ],
+            ),
           ),
         ),
       ),

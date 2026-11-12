@@ -170,3 +170,22 @@ abstract final class AppTheme {
     );
   }
 }
+
+/// I colori delle schede: la prima è viola (il colore dell'app), la seconda
+/// blu, e così via. Dalla settima si ricomincia.
+///
+/// Sono tutti scuri (il testo sopra è bianco) e niente verde né arancione:
+/// sono i colori della pillola "Inizia" e della modalità Focus, che sopra
+/// un banner verde o arancione sparirebbero.
+const workoutPalette = [
+  Color(0xFF5B3FD1), // viola
+  Color(0xFF1E6BD6), // blu
+  Color(0xFFB42F7C), // magenta
+  Color(0xFF0E6E7E), // petrolio
+  Color(0xFF8A5A1E), // bronzo
+  Color(0xFF4A4F63), // ardesia
+];
+
+/// Il colore della scheda in posizione [index] (0 = la prima).
+/// `%` è il resto della divisione: 6 → 0, 7 → 1… così i colori si ripetono.
+Color workoutColor(int index) => workoutPalette[index % workoutPalette.length];

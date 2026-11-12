@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:my_workout/data/profile_store.dart';
+import 'package:my_workout/features/focus/focus_tutorial_page.dart';
+import 'package:my_workout/features/focus/workout_history_page.dart';
 import 'package:my_workout/features/profile/profile_avatar.dart';
 
 /// Apre il pannello del profilo dal basso.
@@ -31,6 +33,14 @@ class ProfileSheet extends StatelessWidget {
     );
     // null = l'utente ha premuto Annulla.
     if (name != null) await profile.setName(name);
+  }
+
+  /// Chiude il pannello e apre una pagina. Il Navigator lo prendiamo prima
+  /// di chiudere: dopo il pop il context del pannello non c'è più.
+  void _open(BuildContext context, WidgetBuilder page) {
+    final navigator = Navigator.of(context);
+    navigator.pop();
+    navigator.push(MaterialPageRoute<void>(builder: page));
   }
 
   @override
@@ -66,6 +76,21 @@ class ProfileSheet extends StatelessWidget {
                   icon: const Icon(Icons.edit_outlined, size: 20),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            // Gli allenamenti finiti in modalità Focus.
+            FilledButton.icon(
+              onPressed: () => _open(context, (_) => const WorkoutHistoryPage()),
+              icon: const Icon(Icons.history),
+              label: const Text('Storico allenamenti'),
+            ),
+            TextButton.icon(
+              onPressed: () => _open(
+                context,
+                (context) => FocusTutorialPage(onDone: () => Navigator.of(context).pop()),
+              ),
+              icon: const Icon(Icons.help_outline),
+              label: const Text('Come funziona il Focus'),
             ),
             const SizedBox(height: 16),
             // Il backup su Google Drive arriverà in una prossima versione:

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:my_workout/data/profile_store.dart';
 import 'package:my_workout/data/user_data_store.dart';
 import 'package:my_workout/data/workout_repository.dart';
 import 'package:my_workout/features/plan_editor/days_editor.dart';
@@ -11,10 +12,12 @@ import 'package:my_workout/models/exercise.dart';
 import 'package:my_workout/widgets/save_on_exit.dart';
 
 /// "Modifica la scheda" (matita nella tab Allenamento): gli stessi pezzi
-/// dell'onboarding, giorni e schede, in una pagina sola.
+/// dell'onboarding, giorni, schede e vista degli esercizi, in una pagina sola.
 ///
-/// Le modifiche restano nel [PlanDraft] e si salvano da sole quando torni
-/// indietro ([SaveOnExit]).
+/// Le modifiche alla scheda restano nel [PlanDraft] e si salvano da sole
+/// quando torni indietro ([SaveOnExit]). La vista degli esercizi invece non
+/// fa parte della scheda: è una preferenza del [ProfileStore] e si salva
+/// subito, appena tocchi l'interruttore.
 class PlanEditorPage extends StatefulWidget {
   const PlanEditorPage({super.key});
 
@@ -123,6 +126,10 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
                 ),
                 const SizedBox(height: 8),
                 WorkoutsEditor(draft: draft, library: data.exercises),
+                const SizedBox(height: 24),
+                Text('Esercizi', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                const _EssentialViewSwitch(),
               ],
             ),
             // Niente pulsante Salva: in fondo compare solo cosa manca, se manca qualcosa.
@@ -136,6 +143,30 @@ class _PlanEditorPageState extends State<PlanEditorPage> {
           ),
         );
       },
+    );
+  }
+}
+
+/// L'interruttore della vista essenziale, in una card come le schede.
+///
+/// SwitchListTile è una riga con titolo, sottotitolo e un interruttore:
+/// tutta la riga si tocca, non solo l'interruttore.
+class _EssentialViewSwitch extends StatelessWidget {
+  const _EssentialViewSwitch();
+
+  @override
+  Widget build(BuildContext context) {
+    // of(context) "iscrive" il widget al ProfileStore: quando il valore
+    // cambia l'interruttore si ridisegna da solo nella nuova posizione.
+    final profile = ProfileScope.of(context);
+
+    return Card(
+      child: SwitchListTile(
+        title: const Text('Vista essenziale'),
+        subtitle: const Text('Solo serie, ripetizioni, peso e muscoli: niente video né consigli.'),
+        value: profile.essentialView,
+        onChanged: profile.setEssentialView,
+      ),
     );
   }
 }

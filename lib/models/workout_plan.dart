@@ -307,6 +307,13 @@ class WorkoutPlan {
 
   /// L'ordine delle schede: quello del calendario, oppure quello in cui
   /// sono scritte se il calendario non lo dice.
+  /// La posizione della scheda [id] (0 = la prima): decide il suo colore.
+  /// Se non c'è (scheda cancellata), 0.
+  int indexOfWorkout(String id) {
+    final index = workouts.indexWhere((w) => w.id == id);
+    return index < 0 ? 0 : index;
+  }
+
   List<String> get rotation =>
       schedule.rotation.isNotEmpty ? schedule.rotation : [for (final w in workouts) w.id];
 

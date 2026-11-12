@@ -23,10 +23,14 @@ val hasReleaseKey = keyProperties.getProperty("storeFile") != null
 
 android {
     namespace = "io.github.salvatorenapolano.myworkout"
-    compileSdk = flutter.compileSdkVersion
+    // 37 e non flutter.compileSdkVersion (36): lo chiede flutter_local_notifications.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // "Desugaring": porta le API di Java più nuove (date e orari) anche
+        // sui telefoni vecchi. Serve a flutter_local_notifications.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -82,4 +86,8 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

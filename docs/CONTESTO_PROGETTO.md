@@ -16,7 +16,7 @@ App Flutter **pubblica e open source** (licenza MIT) per la palestra: scheda di 
 
 | Tab | Stato |
 |---|---|
-| **Allenamento** | ✅ Fatto: Fase 2 Push/Pull/Legs, dettaglio esercizio con video, consigli e pesi salvati |
+| **Allenamento** | ✅ Fatto: Fase 2 Push/Pull/Legs, dettaglio esercizio con video, consigli e pesi salvati, **modalità Focus** (cronometro, recuperi, kcal, storico) |
 | **Dieta** | ✅ Fatto: settimana tipo, pranzo e cena |
 | **Pesata** | ✅ Fatto: promemoria nel giorno scelto (default venerdì), storico pesate con differenze |
 | **Spesa** | ✅ Fatto: liste create dall'utente (editor che si salva da solo), reparti colorati e richiudibili, spunte e Reset |
@@ -27,9 +27,9 @@ App Flutter **pubblica e open source** (licenza MIT) per la palestra: scheda di 
 - Colore seme **viola intenso `0xFF5B3FD1`** (scelto il 10/11/2026; provati prima verde petrolio `0xFF0E7C86` e arancio energia `0xFFD9590B`; il rosso non mi piace), variante `DynamicSchemeVariant.fidelity` per tenere il colore pieno. Si cambia solo `AppTheme.seedColor` (+ i colori in `tool/generate_app_icon.py` per l'icona). Nota: è vicino ai badge di schiena (`#5E5CE6`) e spalle (`#BF5AF2`). Anche l'icona dell'app è viola.
 - Logo "my**Workout**" nell'header in **Russo One** (`AppTheme.logoFont`, `assets/fonts/RussoOne-Regular.ttf`, licenza OFL in `RussoOne-OFL.txt`), solo lì.
 - Stile "lavagna della sala pesi": font **Barlow Semi Condensed** (in `assets/fonts/`, licenza OFL) per titoli e numeri, font di sistema per il testo; raggi 28 (banner) / 20 (card) / 12 (riquadri interni); pagine grigio chiaro con card bianche (in scuro: card più chiare dello sfondo). Tutto in `lib/app_theme.dart`.
-- Pacchetti: `flutter_svg` (anteprime), `shared_preferences` (pesi salvati), `youtube_player_iframe` (video), `path_provider` (cartella dei dati dell'utente), `flutter_localizations` (Flutter in italiano).
+- Pacchetti: `flutter_svg` (anteprime), `shared_preferences` (pesi salvati), `youtube_player_iframe` (video), `path_provider` (cartella dei dati dell'utente), `flutter_localizations` (Flutter in italiano), `flutter_local_notifications` + `timezone` (notifica a fine recupero), `vibration` (vibrazione a fine recupero con l'app aperta).
 - Nessun backend e niente download: la libreria (esercizi e immagini) è **negli asset**; scheda e dieta dell'utente sono JSON sul telefono (`UserDataStore`), pesi, pesate e spunte in `shared_preferences`.
-- Android: permesso `INTERNET` nel manifest (serve ai video). Nome app sotto l'icona: **InScheda** (`android:label`, `CFBundleDisplayName`; logo nell'header "In" + "**Scheda**" nel colore principale, benvenuto "Benvenuto su InScheda"). ID app (Android e iOS) `io.github.salvatorenapolano.myworkout`: definitivo, non cambiarlo dopo la pubblicazione su Google Play.
+- Android: permesso `INTERNET` nel manifest (serve ai video). Per il Focus: `VIBRATE`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`, `RECEIVE_BOOT_COMPLETED` e i due receiver di flutter_local_notifications; in Gradle `compileSdk = 37`, AGP 9.1.1 e core library desugaring (`desugar_jdk_libs 2.1.4`), richiesti da flutter_local_notifications 23. iOS: delegate di `UNUserNotificationCenter` in `AppDelegate.swift`. Nome app sotto l'icona: **InScheda** (`android:label`, `CFBundleDisplayName`; logo nell'header "In" + "**Scheda**" nel colore principale, benvenuto "Benvenuto su InScheda"). ID app (Android e iOS) `io.github.salvatorenapolano.myworkout`: definitivo, non cambiarlo dopo la pubblicazione su Google Play.
 - Icona: dopo `dart run flutter_launcher_icons` **ripristinare** `ios/Runner.xcodeproj/project.pbxproj` (`git checkout -- …`): la v0.14.4 lo modifica per errore (mette `AppIcon` in `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS`).
 
 ## Struttura del codice
@@ -44,8 +44,10 @@ lib/
 ├── data/                     # workout_repository, diet_repository (leggono e validano i JSON)
 │                             # weight_store.dart (ChangeNotifier + InheritedNotifier WeightScope)
 │                             # data_bundle.dart: DataBundle, l'AssetBundle "a piani" (cartella → piano di sotto)
-│                             # profile_store.dart: nome, iniziali, onboarding fatto (ProfileScope)
+│                             # profile_store.dart: nome, iniziali, onboarding fatto, vista essenziale (ProfileScope)
 │                             # user_data_store.dart: la scheda creata dall'utente, piano più alto del DataBundle
+│                             # focus_store.dart: Focus in corso, timer del recupero, storico (FocusModeScope)
+│                             # focus_alerts.dart: FocusAlerts (Device… coi plugin, Silent… nei test)
 ├── utils/formatters.dart     # formatRest (120→2', 90→90"), formatWeight (22,5 kg), date in italiano
 └── features/
     ├── workout/              # workout_page, exercise_detail_page, widgets/ (today_banner,
@@ -56,7 +58,7 @@ lib/
     │                         #   widgets/department_badge (quadratino colorato con l'icona del reparto)
     ├── shopping_editor/      # shopping_draft (la spesa in modifica), shopping_editor_page (liste, reparti, prodotti),
     │                         #   shopping_item_dialog (nome con suggerimenti, quantità, reparto, nota), department_dialog
-    ├── onboarding/           # onboarding_page: PageView benvenuto → nome → hai già una scheda? → giorni → schede → pesata → tutto pronto
+    ├── onboarding/           # onboarding_page: PageView benvenuto → nome → hai già una scheda? → giorni → schede → vista esercizi → pesata → tutto pronto
     ├── plan_import/          # plan_import (prompt per l'IA, extractJson, parsePlanImport tollerante), plan_import_page (3 passi + anteprima, applyPlanImport)
     ├── plan_editor/          # l'editor della scheda, usato dall'onboarding e da "Modifica la scheda":
     │                         #   plan_draft (ChangeNotifier con la scheda in modifica), days_editor,
@@ -64,7 +66,9 @@ lib/
     │                         #   (libreria per gruppi), planned_exercise_dialog (serie/rip./recupero), plan_editor_page
     ├── diet_editor/          # diet_draft (la dieta in modifica), diet_editor_page (giorni, pasti, "Copia il giorno"),
     │                         #   food_item_dialog (alimento, quantità "250-300", unità, nota)
-    └── profile/              # profile_avatar (iniziali dal ProfileStore), profile_sheet (nome + pannello dati)
+    ├── focus/                # calories (stima MET), focus_actions (inizia/termina/pannello), focus_tutorial_page,
+    │                         #   workout_history_page, widgets/ (focus_widgets: ticker, glow, pillola, pulsanti; rest_timer_card)
+    └── profile/              # profile_avatar (iniziali dal ProfileStore), profile_sheet (nome, storico, pannello dati)
 lib/widgets/                  # condivisi: main_app_bar (header), status_banner, weight_input_dialog, dividers
 assets/data/                  # SOLO exercises.json (la libreria): l'app parte senza scheda, dieta e spesa
 test/fixtures/                # workout_plan.json, diet.json, shopping.json: i miei dati, ora solo dati di prova dei test
@@ -128,9 +132,10 @@ Salvata dall'editor in `<support>/user_data/assets/data/shopping.json` (`UserDat
 Nella scelta esercizi, **Crea un esercizio**: nome, gruppo muscolare (decide anche la famiglia: Addominali → abs, Riscaldamento → warmup, il resto pesi con "Il tuo peso"), muscoli e spiegazione facoltativi. Id `personale_<nome>`. Salvati in `<support>/user_data/assets/data/custom_exercises.json` (`UserDataStore.addCustomExercise`), letti da `WorkoutRepository` in fondo alla libreria. Niente SVG: `ExercisePreview` disegna il quadrato col colore del gruppo (`MuscleGroup.color`) e l'iniziale del nome. Per ora non si modificano né si cancellano.
 
 ### Dati dell'utente (tutti in `shared_preferences`)
-- Profilo: `profile_name` (testo), `onboarding_done` (bool) e `weigh_in_weekday` (int, 1 = lunedì … 7 = domenica; senza = venerdì, `defaultWeighInWeekday`). Finché `onboarding_done` è false l'app mostra `OnboardingPage` invece delle tab (`ProfileStore`).
+- Profilo: `profile_name` (testo), `onboarding_done` (bool), `focus_tutorial_pending` (bool, true appena finito l'onboarding: si vede il tutorial del Focus), `weigh_in_weekday` (int, 1 = lunedì … 7 = domenica; senza = venerdì, `defaultWeighInWeekday`) e `essential_view` (bool, senza = false: vista guidata). Finché `onboarding_done` è false l'app mostra `OnboardingPage` invece delle tab (`ProfileStore`).
 - Pesi per esercizio: chiave `weight_<exerciseId>`, in kg (anche decimali). Non è una checklist delle serie: è solo un promemoria del peso usato.
 - Pesate: chiave `body_weights`, testo JSON `[{"date": "2026-11-06", "kg": 78.4}, …]`, una per giorno (`BodyWeightStore`).
+- Focus: `focus_active` (JSON dell'allenamento in corso: inizio, scheda, peso corporeo, cardio, recuperi; se l'app si chiude il cronometro riparte da lì), `workout_history` (JSON degli allenamenti finiti, dal più recente), `focus_exact_alarm_asked` (bool: il permesso "Sveglie e promemoria" si spiega una volta sola).
 - Spunte della spesa: chiave `shopping_checked`, lista degli id spuntati (`ShoppingStore`). Dopo ogni salvataggio dell'editor si tengono solo quelle dei prodotti che esistono ancora (`retainOnly`).
 
 ## Com'è fatta l'interfaccia
@@ -144,7 +149,7 @@ Nella scelta esercizi, **Crea un esercizio**: nome, gruppo muscolare (decide anc
 - Righe esercizio: anteprima SVG (con **numero d'ordine** nell'angolo, solo nei pesi), nome, "3 × 10–12 · rec. 90\"", peso salvato a destra.
 - Riscaldamento e addominali sono blocchi espandibili.
 
-**Dettaglio esercizio** (tap su una riga): video YouTube al posto dell'anteprima se c'è, nome, card "in scheda" (serie, recupero, note), card **Il tuo peso** (− / + di 1 kg, tap per scriverlo), card **Muscoli** (illustrazione anatomica con muscolo in rosso + elenco; tap = schermo intero con zoom), "Come si esegue", consigli, "Se è occupato". Senza illustrazione i muscoli restano chip sotto il nome.
+**Dettaglio esercizio** (tap su una riga): video YouTube al posto dell'anteprima se c'è, nome, card "in scheda" (serie, recupero, note), card **Il tuo peso** (− / + di 1 kg, tap per scriverlo), card **Muscoli** (illustrazione anatomica con muscolo in rosso + elenco; tap = schermo intero con zoom), "Come si esegue", consigli, "Se è occupato". Senza illustrazione i muscoli restano chip sotto il nome. **Vista essenziale** (per esperti, `ProfileStore.essentialView`, deciso l'11/11/2026): niente video (il player non viene creato: anteprima piccola accanto al nome), niente "Come si esegue" né consigli; restano i dati della scheda (serie, ripetizioni, recupero, note, "Se è occupato"), il peso e i muscoli. Si sceglie nell'onboarding e si cambia con l'interruttore **Vista essenziale** in fondo a "Modifica la scheda" (si salva subito, non passa da `SaveOnExit`).
 
 **Dieta**: schede Lun…Dom (si apre su oggi), chip **Palestra giallo** / Riposo bianco, una card per pasto: **☀️ Pranzo (13:00) con sfondo giallo tenue, 🌙 Cena (20:00) con sfondo blu tenue**. Intestazione del pasto centrata con divisore sotto, ingredienti a pallini. Niente riquadro "Da sapere" (le note restano nel JSON).
 
@@ -183,9 +188,22 @@ Nella versione pubblica **non c'è nessun download**: tolti il pulsante "Scarica
 
 File "myWorkout" con wireframe iniziali (pagine Wireframe/Componenti/Design, variabili colore e stili testo iOS). Il piano Starter ha esaurito le chiamate MCP, quindi il file non riflette le ultime modifiche: oggi **il riferimento è l'app**, non Figma.
 
+## Modalità Focus (deciso l'11/11/2026)
+
+- **Si attiva** con la **pillola verde "▶ Inizia"** nel banner della tab Allenamento, **a destra del testo** (`BannerActionButton`: `StadiumBorder`, scritta corta, tooltip "Inizia allenamento"). Scelta l'11/11/2026 fra 5 varianti (tessera verticale, cerchio play, pillola bianca, pillola verde, riga dentro il banner): la tessera verticale non piaceva. C'è sempre quando esiste una prossima seduta: nei giorni di riposo avvia la prossima scheda. Il peso corporeo viene dall'ultima pesata; senza pesate lo chiede ("Quanto pesi?") e lo salva come pesata di oggi.
+- **Durante il Focus**: bagliore arancione (`FocusColors.glow`) che "respira" piano ai bordi di tutto lo schermo (`FocusGlow` nel builder di MaterialApp, sopra anche ai dialog, `IgnorePointer`); cronometro in una pillola arancione **fra logo e profilo** nell'header (e nell'AppBar del dettaglio), con accanto il recupero che scorre; toccandola si apre il pannello con le metriche e "Termina allenamento". Il banner diventa "Focus: <scheda>" con tempo · kcal · recuperi e la pillola arancione **"⏹ Termina"** (stessa forma, tooltip "Termina allenamento").
+- **Dettaglio esercizio in Focus**: in cima il **timer** al posto del video (recupero dell'esercizio, o i minuti per il cardio con "Avvia timer"); il video sta in un pannello **Video** che si apre e si chiude (ExpansionTile: il player nasce solo da aperto). In vista essenziale niente video. **Niente conteggio delle serie** (scelta dell'utente: solo "Avvia recupero"); un timer alla volta, avviarne un altro lo sostituisce.
+- **Fine recupero**: app aperta → Timer di Dart + vibrazione (3 colpi); la notifica ha titolo **"Recupero finito"** e come testo solo il nome dell'esercizio; app nascosta o schermo spento → notifica programmata con `zonedSchedule` (messa in `AppLifecycleListener.onHide`, tolta in `onShow`). Esatta solo col permesso "Sveglie e promemoria" (Android 14+ lo concede l'utente: dialog spiegato una volta, "Apri impostazioni"); senza, `inexactAllowWhileIdle`. Scelta dell'utente: notifica invece di tenere lo schermo acceso.
+- **Kcal** (rifatto il 12/11/2026, per esercizio; si mostrano solo i totali): MET × kg × ore, in tre pezzi. (1) **Serie dei pesi**: ogni "Avvia recupero" = una serie finita di quell'esercizio (`StrengthLog` in `ActiveFocus.strength`, col carico salvato in quel momento); serie fatte = recuperi + 1 (l'ultima), mai oltre le serie della scheda. Una serie = sforzo (6 MET per reps × 3,5 s; a tempo i secondi) + lavoro (carico × 9,81 × corsa del gruppo × reps ÷ rendimento 0,2), × fattore del gruppo (gambe 1,3; petto/schiena 1; spalle/braccia 0,7; addominali e riscaldamento 0,6). Senza peso (addominali, riscaldamento) il carico è il 30% del peso corporeo; pesi mai salvati = 0 kg (conta solo lo sforzo). Reps "8–12" → 10, "per lato" ×2, "1'" → 60 s. Esempio: chest press 40 kg × 10 per 80 kg ≈ 6,5 kcal. (2) **Cardio**: i **minuti scritti nella scheda** coi MET della macchina (tapis ACSM, cyclette 3,5→10,2 e stair climber 4→11,6 per livello 1→20; la camminata finale `plan.cardio` come tapis), ridotto in proporzione se il tempo (tolte le serie) non basta. (3) **Il resto del tempo** (recuperi, spostamenti) a 2,5 MET. Calcolo in `lib/features/focus/calories.dart`.
+- **Termina**: dialog con le metriche e Scarta / Continua / Termina (Scarta chiede conferma), poi il riepilogo "<scheda>: fatto!".
+- **Colori delle schede** (deciso il 12/11/2026): tavolozza fissa di 6 colori scuri, senza verde né arancione (`workoutPalette` in `app_theme.dart`: viola, blu, magenta, petrolio, bronzo, ardesia), assegnati per posizione nel piano (`plan.indexOfWorkout`, `workoutColor(i)`); dalla settima scheda si ricomincia. Il banner del giorno di palestra è **tutto** del colore della scheda (testo bianco; nei giorni di riposo resta neutro), anche quello del Focus; il segmento scelto del selettore delle schede prende lo stesso colore. Il Focus salva `colorIndex` all'inizio e lo storico lo tiene (`WorkoutSession.colorIndex`): riordinando le schede gli allenamenti vecchi non cambiano colore; quelli salvati prima restano viola.
+- **Storico allenamenti** (pannello del profilo): totali (allenamenti, tempo, kcal) e una card per allenamento (quadratino 56 px del colore della scheda con la lettera, `workoutInitial`: "Scheda A" → A, "Push" → P, e la data; poi giorno, ora, durata, kcal, recuperi; menu ⋮ → Elimina).
+- **Tutorial**: 4 pagine (banner in miniatura con "Inizia", cronometro e bordi, recupero, storico) con i pezzi veri dell'app disegnati; compare una volta dopo "Entra" dell'onboarding e si riapre dal profilo ("Come funziona il Focus"). Chi aveva già fatto l'onboarding prima non lo vede da solo.
+- Test: `ExerciseMedia.videoEnabled = false` e `FocusGlow.animate = false`; `FocusStore.load(alerts: SilentFocusAlerts(), now: …)` per far passare il tempo a comando.
+
 ## Onboarding (versione pubblica)
 
-Primo avvio: **Benvenuto → Come ti chiami? → Hai già una scheda? → Quando ti alleni? → Le tue schede → Quando ti pesi? → Tutto pronto** (`lib/features/onboarding/`). Si avanza solo coi pulsanti (niente swipe); "Avanti" è spento senza nome, senza giorni, o se una scheda non ha esercizi. La scheda vive in un `PlanDraft` e si salva solo con "Entra" (prima `savePlan`, poi `completeOnboarding`). "Quando ti pesi?": un giorno solo (`WeighInDayPicker`, venerdì preselezionato). "Tutto pronto" riassume schede, giorni e pesata, e in una card con una matita spiega che **scheda, dieta e giorno della pesata si cambiano con la matita accanto al titolo della loro schermata**. Una seconda card, con il cerchio del profilo disegnato, dice di toccarlo in alto a destra per modificare il profilo e che presto da lì si salveranno e recupereranno i dati su Google Drive.
+Primo avvio: **Benvenuto → Come ti chiami? → Hai già una scheda? → Quando ti alleni? → Le tue schede → Come vuoi vedere gli esercizi? → Quando ti pesi? → Tutto pronto** (`lib/features/onboarding/`). Si avanza solo coi pulsanti (niente swipe); "Avanti" è spento senza nome, senza giorni, o se una scheda non ha esercizi. La scheda vive in un `PlanDraft` e si salva solo con "Entra" (prima `savePlan`, poi `completeOnboarding`). "Come vuoi vedere gli esercizi?": due card da scegliere, **Guidata** (preselezionata: video, come si esegue, consigli) o **Essenziale** (solo serie, ripetizioni, peso e muscoli). "Quando ti pesi?": un giorno solo (`WeighInDayPicker`, venerdì preselezionato). "Tutto pronto" riassume schede, giorni e pesata, e in una card con una matita spiega che **scheda, dieta e giorno della pesata si cambiano con la matita accanto al titolo della loro schermata**. Una seconda card, con il cerchio del profilo disegnato, dice di toccarlo in alto a destra per modificare il profilo e che presto da lì si salveranno e recupereranno i dati su Google Drive.
 Piano deciso:
 1. ✅ Benvenuto + nome (iniziali nell'avatar, nome modificabile dal profilo). Immagine del profilo: in futuro, non prioritaria.
 2. ✅ Strato **dati utente** (`UserDataStore`): la scheda dell'utente è salvata in `<support>/user_data/assets/data/workout_plan.json`, stesso formato e percorso degli asset. `DataBundle(cartella, below)` si impila: utente → app (`userData.bundleOver(assets ?? rootBundle)` in app.dart, memoizzato; `MyWorkoutApp.assets` serve ai test per i dati di prova). La libreria esercizi e le immagini arrivano sempre dal piano di sotto. Tutti i modelli di scheda e dieta hanno `toJson()`. Da sapere: se una versione nuova dell'app toglie un esercizio usato nella scheda dell'utente, la tab Allenamento mostra l'errore.

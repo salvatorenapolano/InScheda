@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:my_workout/app_theme.dart';
+import 'package:my_workout/features/focus/widgets/focus_widgets.dart';
 import 'package:my_workout/features/profile/profile_avatar.dart';
 import 'package:my_workout/features/profile/profile_sheet.dart';
 
@@ -29,14 +30,21 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       // Text.rich: un testo fatto di pezzi con stili diversi.
       // Tutto in Russo One (il font del logo); "Scheda" col colore principale.
       // ("Stare in scheda" = seguire il programma: da qui il nome.)
-      title: Text.rich(
-        TextSpan(
-          style: const TextStyle(fontFamily: AppTheme.logoFont, fontWeight: FontWeight.w400),
-          children: [
-            const TextSpan(text: 'In'),
-            TextSpan(text: 'Scheda', style: TextStyle(color: primary)),
-          ],
-        ),
+      // Durante il Focus, fra il logo e il profilo, il cronometro
+      // (fuori dal Focus FocusClockChip non disegna niente).
+      title: Row(
+        children: [
+          Text.rich(
+            TextSpan(
+              style: const TextStyle(fontFamily: AppTheme.logoFont, fontWeight: FontWeight.w400),
+              children: [
+                const TextSpan(text: 'In'),
+                TextSpan(text: 'Scheda', style: TextStyle(color: primary)),
+              ],
+            ),
+          ),
+          const Expanded(child: Center(child: FocusClockChip())),
+        ],
       ),
       actions: [
         IconButton(

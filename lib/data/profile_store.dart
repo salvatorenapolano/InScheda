@@ -17,6 +17,8 @@ class ProfileStore extends ChangeNotifier {
   static const _nameKey = 'profile_name';
   static const _onboardingKey = 'onboarding_done';
   static const _weighInKey = 'weigh_in_weekday';
+  static const _essentialKey = 'essential_view';
+  static const _focusTutorialKey = 'focus_tutorial_pending';
 
   /// Apre la memoria del telefono. Va fatto una volta, all'avvio.
   static Future<ProfileStore> load() async {
@@ -35,6 +37,27 @@ class ProfileStore extends ChangeNotifier {
   /// Il giorno della pesata: 1 = lunedì … 7 = domenica (di default venerdì).
   int get weighInWeekday => _prefs.getInt(_weighInKey) ?? defaultWeighInWeekday;
 
+  /// true = vista essenziale degli esercizi, per chi li conosce già:
+  /// niente video, spiegazione e consigli, solo serie, ripetizioni, peso
+  /// e muscoli. false (il default) = vista guidata, con tutto.
+  bool get essentialView => _prefs.getBool(_essentialKey) ?? false;
+
+  /// true appena finito l'onboarding: prima delle tab si vede il tutorial
+  /// della modalità Focus (una volta sola).
+  bool get focusTutorialPending => _prefs.getBool(_focusTutorialKey) ?? false;
+
+  /// "Ho capito" o "Salta" nel tutorial: non lo mostriamo più.
+  Future<void> markFocusTutorialSeen() async {
+    await _prefs.setBool(_focusTutorialKey, false);
+    notifyListeners();
+  }
+
+  /// Cambia la vista degli esercizi (dalla modifica della scheda).
+  Future<void> setEssentialView(bool value) async {
+    await _prefs.setBool(_essentialKey, value);
+    notifyListeners();
+  }
+
   /// Cambia il giorno della pesata (dal pannello del profilo).
   Future<void> setWeighInWeekday(int weekday) async {
     await _prefs.setInt(_weighInKey, weekday);
@@ -47,9 +70,16 @@ class ProfileStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// L'ultima pagina dell'onboarding: salva il nome e segna che è fatto.
-  Future<void> completeOnboarding({required String name, int weighInWeekday = defaultWeighInWeekday}) async {
+  /// L'ultima pagina dell'onboarding: salva nome, pesata e vista degli
+  /// esercizi, e segna che è fatto.
+  Future<void> completeOnboarding({
+    required String name,
+    int weighInWeekday = defaultWeighInWeekday,
+    bool essentialView = false,
+  }) async {
     await _prefs.setInt(_weighInKey, weighInWeekday);
+    await _prefs.setBool(_essentialKey, essentialView);
+    await _prefs.setBool(_focusTutorialKey, true);
     await _prefs.setString(_nameKey, name.trim());
     await _prefs.setBool(_onboardingKey, true);
     notifyListeners();

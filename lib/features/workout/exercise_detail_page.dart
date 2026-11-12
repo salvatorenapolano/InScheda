@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:my_workout/app_theme.dart';
+import 'package:my_workout/data/focus_store.dart';
+import 'package:my_workout/data/profile_store.dart';
+import 'package:my_workout/features/focus/widgets/focus_widgets.dart';
+import 'package:my_workout/features/focus/widgets/rest_timer_card.dart';
 import 'package:my_workout/data/weight_store.dart';
 import 'package:my_workout/features/workout/widgets/exercise_media.dart';
+import 'package:my_workout/features/workout/widgets/exercise_preview.dart';
 import 'package:my_workout/features/workout/widgets/muscle_card.dart';
 import 'package:my_workout/models/exercise.dart';
 import 'package:my_workout/models/workout_plan.dart';
@@ -11,6 +16,13 @@ import 'package:my_workout/widgets/weight_input_dialog.dart';
 
 /// Il dettaglio di un esercizio: anteprima, cosa dice la scheda,
 /// il tuo peso, come si esegue, consigli e alternative.
+///
+/// Con la vista essenziale (ProfileStore.essentialView) restano solo i dati
+/// della TUA scheda (serie, ripetizioni, recupero, note, alternative), il
+/// peso e i muscoli: video, spiegazione e consigli della libreria spariscono.
+///
+/// In modalità Focus in cima c'è il timer del recupero (o dei minuti del
+/// cardio) e il video sta in un pannello che si apre e si chiude.
 class ExerciseDetailPage extends StatelessWidget {
   const ExerciseDetailPage({
     super.key,
@@ -29,18 +41,48 @@ class ExerciseDetailPage extends StatelessWidget {
     // In una variabile locale: Dart così "sa" che dopo il controllo
     // `!= null` è una String vera (promozione di tipo).
     final muscleAsset = exercise.muscleAsset;
+    final essential = ProfileScope.of(context).essentialView;
+    final focusActive = FocusModeScope.of(context).isActive;
+    // Il video si mostra solo se c'è e se non sei in vista essenziale.
+    final hasVideo = !essential && exercise.videoUrl != null;
 
     return Scaffold(
       // La freccia indietro la aggiunge l'AppBar da sola, perché sa
       // che questa pagina è stata aperta con Navigator.push.
-      appBar: AppBar(title: Text(sectionTitle)),
+      // Anche qui, durante il Focus, il cronometro dell'allenamento.
+      appBar: AppBar(
+        title: Text(sectionTitle),
+        actions: const [FocusClockChip(), SizedBox(width: 12)],
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          // Video YouTube se c'è, altrimenti l'anteprima SVG.
-          ExerciseMedia(exercise: exercise),
-          const SizedBox(height: 16),
-          Text(exercise.name, style: textTheme.headlineMedium),
+          // Vista essenziale e Focus: niente video in cima, solo l'anteprima
+          // piccola accanto al nome. Il player YouTube non viene proprio
+          // creato (e non carica niente da internet).
+          if (essential || focusActive) ...[
+            Row(
+              children: [
+                ExercisePreview(exercise: exercise, size: 56),
+                const SizedBox(width: 16),
+                Expanded(child: Text(exercise.name, style: textTheme.headlineMedium)),
+              ],
+            ),
+            // Focus: il timer al posto del video, il video "chiuso" sotto.
+            if (focusActive && RestTimerCard.secondsFor(planned) != null) ...[
+              const SizedBox(height: 16),
+              RestTimerCard(planned: planned, exercise: exercise),
+            ],
+            if (focusActive && hasVideo) ...[
+              const SizedBox(height: 12),
+              _VideoPanel(exercise: exercise),
+            ],
+          ] else ...[
+            // Video YouTube se c'è, altrimenti l'anteprima SVG.
+            ExerciseMedia(exercise: exercise),
+            const SizedBox(height: 16),
+            Text(exercise.name, style: textTheme.headlineMedium),
+          ],
           // I chip sotto il nome solo se manca l'illustrazione:
           // altrimenti i muscoli sono già nella card "Muscoli" più in basso.
           if (exercise.muscles.isNotEmpty && muscleAsset == null) ...[
@@ -65,12 +107,12 @@ class ExerciseDetailPage extends StatelessWidget {
             MuscleCard(exercise: exercise, asset: muscleAsset),
           ],
           // Gli esercizi personali possono non avere una spiegazione.
-          if (exercise.description.isNotEmpty)
+          if (!essential && exercise.description.isNotEmpty)
             _Section(
               title: 'Come si esegue',
               child: Text(exercise.description, style: textTheme.bodyLarge),
             ),
-          if (exercise.tips.isNotEmpty)
+          if (!essential && exercise.tips.isNotEmpty)
             _Section(
               title: 'Consigli',
               child: Column(
@@ -241,6 +283,33 @@ class _Section extends StatelessWidget {
           const SizedBox(height: 8),
           child,
         ],
+      ),
+    );
+  }
+}
+
+/// Il video in un pannello che si apre e si chiude (in modalità Focus).
+///
+/// ExpansionTile: una riga che, toccata, mostra i suoi figli sotto. Da
+/// chiusa non li costruisce proprio: il player YouTube nasce solo quando
+/// apri il pannello, e sparisce (liberando memoria) quando lo richiudi.
+class _VideoPanel extends StatelessWidget {
+  const _VideoPanel({required this.exercise});
+
+  final Exercise exercise;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ExpansionTile(
+        leading: const Icon(Icons.play_circle_outline),
+        title: const Text('Video'),
+        subtitle: const Text("Come si esegue l'esercizio"),
+        // Senza i bordi che ExpansionTile disegna quando è aperto: c'è già la card.
+        shape: const Border(),
+        collapsedShape: const Border(),
+        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        children: [ExerciseMedia(exercise: exercise)],
       ),
     );
   }
